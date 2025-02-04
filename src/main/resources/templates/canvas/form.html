@@ -1,0 +1,870 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>Bounded Context Canvas Management</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="/css/bootstrap-icons.min.css" rel="stylesheet" />
+    <link href="/css/application.css" rel="stylesheet" />
+    <script type="text/javascript" src="/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript" src="/js/jquery.serializejson.min.js"></script>
+    <script type="text/javascript">
+        const create = [[${id == 0}]];
+
+        const assumption = `
+            <li class="text-start">
+                <div class="input-group mb-2">
+                    <input type="text" class="form-control" name="assumptions[]" />
+                    <span class="input-group-text bi bi-journal-minus remove clickable"></span>
+                </div>
+            </li>
+           `;
+        const verificationMetric = `
+            <li class="text-start">
+                <div class="input-group mb-2">
+                    <input type="text" class="form-control" name="verificationMetrics[]" />
+                    <span class="input-group-text bi bi-journal-minus remove clickable"></span>
+                </div>
+            </li>
+           `;
+        const openQuestion = `
+            <li class="text-start">
+                <div class="input-group mb-2">
+                    <input type="text" class="form-control" name="openQuestions[]" />
+                    <span class="input-group-text bi bi-journal-minus remove clickable"></span>
+                </div>
+            </li>
+           `;
+        const businessDecision = `
+            <li class="text-start">
+                <div class="input-group mb-2">
+                    <textarea class="form-control" name="businessDecisions[]"></textarea>
+                    <span class="input-group-text bi bi-journal-minus remove clickable"></span>
+                </div>
+            </li>
+           `;
+
+        let ubiquitousLanguageCounter = [[${#lists.size(boundedContext?.ubiquitousLanguage)+1}]];
+
+        function createUbiquitousLanguage() {
+            const ubiquitousLanguage = `
+                <li class="text-start">
+                    <div class="input-group mb-2">
+                        <div style="width:89.5%;">
+                            <input type="text" class="form-control" name="ubiquitousLanguage[][name]" title="name" />
+                            <textarea class="form-control" name="ubiquitousLanguage[][description]" title="description"></textarea>
+                        </div>
+                        <span class="input-group-text bi bi-journal-minus remove clickable"></span>
+                    </div>
+                </li>
+               `;
+            ubiquitousLanguageCounter++;
+            return ubiquitousLanguage.replaceAll("__index__", "");
+        }
+
+        let inboundCounter = [[${#lists.size(boundedContext?.inboundCommunication)+1}]];
+
+        function createInboundCommunication() {
+            const inboundCommunication = `
+                <li class="text-start" style="border-bottom: 2px solid #eee">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="m-1">
+                                <h6>Collaborators &nbsp;
+                                    <i title="add collaborator" class="bi bi-journal-plus add clickable inbound-communication-collaborator-add"></i>
+                                    <input type="hidden" name="inboundCommunicationIndex:skip" value="__index__" />
+                                </h6>
+                                <ul class="input">
+                                <li>
+                                    <div class="input-group mb-2">
+                                        <div class="col-9">
+                                            <select name="inboundCommunication[__index__][collaborators][][type]" class="form-control">
+                                                <option value="BOUNDED_CONTEXT" title="Bounded Context">Bounded Context</option>
+                                                <option value="EXTERNAL_SYSTEM" title="External System">External System</option>
+                                                <option value="FRONTEND" title="Frontend">Frontend</option>
+                                                <option value="USER_INTERACTION" title="Direct User Interaction">Direct User Interaction</option>
+                                                <option value="OTHER" title="Other">Other</option>
+                                            </select>
+                                            <input type="text" name="inboundCommunication[__index__][collaborators][][name]" class="form-control" />
+                                        </div>
+                                        <span class="col-3 input-group-text bi bi-journal-minus remove clickable"></span>
+                                    </div>
+                                </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="m-1">
+                                <h6>Messages &nbsp;
+                                    <i title="add message" class="bi bi-journal-plus add clickable inbound-communication-message-add"></i>
+                                    <input type="hidden" name="inboundCommunicationIndex:skip" value="__index__" />
+                                </h6>
+                                <ul class="input">
+                                    <li>
+                                        <div class="input-group mb-2">
+                                            <div class="col-9">
+                                                <select name="inboundCommunication[__index__][messages][][type]" class="form-control">
+                                                    <option value="QUERY" title="Query">Query</option>
+                                                    <option value="COMMAND" title="Command">Command</option>
+                                                    <option value="EVENT" title="Event">Event</option>
+                                                </select>
+                                                <input type="text" name="inboundCommunication[__index__][messages][][name]" class="form-control" />
+                                            </div>
+                                            <span class="col-3 input-group-text bi bi-journal-minus remove clickable"></span>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 remove-communication">
+                            <i class="bi bi-journal-minus remove clickable"></i>
+                        </div>
+                    </div>
+                </li>
+                `;
+            inboundCounter++;
+            return inboundCommunication.replaceAll("__index__", inboundCounter-1);
+        }
+
+        function createInboundCommunicationMessage(index) {
+            const inboundMessage = `
+                <li>
+                    <div class="input-group mb-2">
+                        <div class="col-9">
+                            <select name="inboundCommunication[__index__][messages][][type]" class="form-control">
+                                <option value="QUERY" title="Query">Query</option>
+                                <option value="COMMAND" title="Command">Command</option>
+                                <option value="EVENT" title="Event">Event</option>
+                            </select>
+                            <input type="text" name="inboundCommunication[__index__][messages][][name]" class="form-control" />
+                        </div>
+                        <span class="col-3 input-group-text bi bi-journal-minus remove clickable"></span>
+                    </div>
+                </li>
+                `;
+            return inboundMessage.replaceAll("__index__", index);
+        }
+
+        function createInboundCommunicationCollaborator(index) {
+            const inboundCollaborator = `
+                <li>
+                    <div class="input-group mb-2">
+                        <div class="col-9">
+                            <select name="inboundCommunication[__index__][collaborators][][type]" class="form-control">
+                                <option value="BOUNDED_CONTEXT" title="Bounded Context">Bounded Context</option>
+                                <option value="EXTERNAL_SYSTEM" title="External System">External System</option>
+                                <option value="FRONTEND" title="Frontend">Frontend</option>
+                                <option value="USER_INTERACTION" title="Direct User Interaction">Direct User Interaction</option>
+                                <option value="OTHER" title="Other">Other</option>
+                            </select>
+                            <input type="text" name="inboundCommunication[__index__][collaborators][][name]" class="form-control" />
+                        </div>
+                        <span class="col-3 input-group-text bi bi-journal-minus remove clickable"></span>
+                    </div>
+                </li>
+                `;
+            return inboundCollaborator.replaceAll("__index__", index);
+        }
+
+        let outboundCounter = [[${#lists.size(boundedContext?.outboundCommunication)+1}]];
+
+        function createOutboundCommunication() {
+            const outboundCommunication = `
+                <li class="text-start" style="border-bottom: 2px solid #eee">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="m-1">
+                                <h6>Messages &nbsp;
+                                    <i title="add message" class="bi bi-journal-plus add clickable outbound-communication-message-add"></i>
+                                    <input type="hidden" name="outboundCommunicationIndex:skip" value="__index__" />
+                                </h6>
+                                <ul class="input">
+                                    <li>
+                                        <div class="input-group mb-2">
+                                            <div class="col-9">
+                                                <select name="outboundCommunication[__index__][messages][][type]" class="form-control">
+                                                    <option value="QUERY" title="Query">Query</option>
+                                                    <option value="COMMAND" title="Command">Command</option>
+                                                    <option value="EVENT" title="Event">Event</option>
+                                                </select>
+                                                <input type="text" name="outboundCommunication[__index__][messages][][name]" class="form-control" />
+                                            </div>
+                                            <span class="col-3 input-group-text bi bi-journal-minus remove clickable"></span>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="m-1">
+                                <h6>Collaborators &nbsp;
+                                    <i title="add collaborator" class="bi bi-journal-plus add clickable outbound-communication-collaborator-add"></i>
+                                    <input type="hidden" name="outboundCommunicationIndex:skip" value="__index__" />
+                                </h6>
+                                <ul class="input">
+                                <li>
+                                    <div class="input-group mb-2">
+                                        <div class="col-9">
+                                            <select name="outboundCommunication[__index__][collaborators][][type]" class="form-control">
+                                                <option value="BOUNDED_CONTEXT" title="Bounded Context">Bounded Context</option>
+                                                <option value="EXTERNAL_SYSTEM" title="External System">External System</option>
+                                                <option value="FRONTEND" title="Frontend">Frontend</option>
+                                                <option value="USER_INTERACTION" title="Direct User Interaction">Direct User Interaction</option>
+                                                <option value="OTHER" title="Other">Other</option>
+                                            </select>
+                                            <input type="text" name="outboundCommunication[__index__][collaborators][][name]" class="form-control" />
+                                        </div>
+                                        <span class="col-3 input-group-text bi bi-journal-minus remove clickable"></span>
+                                    </div>
+                                </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 remove-communication">
+                            <i class="bi bi-journal-minus remove clickable"></i>
+                        </div>
+                    </div>
+                </li>
+                `;
+            outboundCounter++;
+            return outboundCommunication.replaceAll("__index__", outboundCounter-1);
+        }
+
+        function createOutboundCommunicationMessage(index) {
+            const outboundMessage = `
+                <li>
+                    <div class="input-group mb-2">
+                        <div class="col-9">
+                            <select name="outboundCommunication[__index__][messages][][type]" class="form-control">
+                                <option value="QUERY" title="Query">Query</option>
+                                <option value="COMMAND" title="Command">Command</option>
+                                <option value="EVENT" title="Event">Event</option>
+                            </select>
+                            <input type="text" name="outboundCommunication[__index__][messages][][name]" class="form-control" />
+                        </div>
+                        <span class="col-3 input-group-text bi bi-journal-minus remove clickable"></span>
+                    </div>
+                </li>
+                `;
+            return outboundMessage.replaceAll("__index__", index);
+        }
+
+        function createOutboundCommunicationCollaborator(index) {
+            const outboundCollaborator = `
+                <li>
+                    <div class="input-group mb-2">
+                        <div class="col-9">
+                            <select name="outboundCommunication[__index__][collaborators][][type]" class="form-control">
+                                <option value="BOUNDED_CONTEXT" title="Bounded Context">Bounded Context</option>
+                                <option value="EXTERNAL_SYSTEM" title="External System">External System</option>
+                                <option value="FRONTEND" title="Frontend">Frontend</option>
+                                <option value="USER_INTERACTION" title="Direct User Interaction">Direct User Interaction</option>
+                                <option value="OTHER" title="Other">Other</option>
+                            </select>
+                            <input type="text" name="outboundCommunication[__index__][collaborators][][name]" class="form-control" />
+                        </div>
+                        <span class="col-3 input-group-text bi bi-journal-minus remove clickable"></span>
+                    </div>
+                </li>
+                `;
+            return outboundCollaborator.replaceAll("__index__", index);
+        }
+
+        function generate(templateType, templateName, id) {
+            let obj = $("#bcc-form").serializeJSON({ useIntKeysAsArrayIndex: true});
+            let json = JSON.stringify(obj);
+            let url = "/api/canvases?templateType=" + templateType + "&templateName=" + templateName;
+            jQuery.ajax ({
+                url: url,
+                type: "POST",
+                data: json,
+                dataType: "html",
+                contentType: "application/json; charset=utf-8",
+                success: function(key) {
+                    window.open("/api/canvases?key=" + key, '_blank');
+                },
+                error: function(response, textStatus, jqXHR) {
+                    if (response.status === 400) {
+                        createAlert($.parseJSON(response.responseText).detail, "warning", 7000);
+                    } else {
+                        createAlert($.parseJSON(response.responseText).detail, "danger", 7000);
+                    }
+                }
+            });
+        }
+
+        function createAlert(message, type, ttl) {
+            const alertTemplate = `
+                <div class="auto-closable-alert container alert alert-__type__ alert-dismissible fade show" role="alert">
+                    __message__
+                    <button type="button" class="btn-close text-right" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                `;
+            let alert = alertTemplate.replace("__message__", message).replace("__type__", type);
+            $("#alerts").append(alert);
+            window.setTimeout(function () {
+                $(".auto-closable-alert").alert('close');
+            }, ttl);
+        }
+
+        $(document).ready(function() {
+            if (!create) {
+                $("input[name='name']").attr("readonly", "readonly");
+            }
+
+            $("select[name='boundedContext.domainRoles.roleTypes'] option").each(function(index) {
+                $(this).attr("title", $(this).text());
+            });
+            $(this).on("click", ".remove", function() {
+               $(this).closest("li").remove();
+            });
+
+            $(this).on("click", ".business-decision-add", function() {
+               $("#business-decisions").append(businessDecision);
+            });
+            $(this).on("click", ".assumption-add", function() {
+               $("#assumptions").append(assumption);
+            });
+            $(this).on("click", ".verification-metric-add", function() {
+               $("#verification-metrics").append(verificationMetric);
+            });
+            $(this).on("click", ".open-question-add", function() {
+               $("#open-questions").append(openQuestion);
+            });
+            $(this).on("click", ".ubiquitous-language-add", function() {
+               $("#ubiquitous-language").append(createUbiquitousLanguage());
+            });
+
+
+            $(this).on("click", ".inbound-communication-add", function() {
+                $("#inbound-communication").append(createInboundCommunication());
+            });
+            $(this).on("click", ".inbound-communication-collaborator-add", function(event) {
+                $(event.target).parent().next().append(createInboundCommunicationCollaborator($(event.target).next().val()));
+            });
+            $(this).on("click", ".inbound-communication-message-add", function(event) {
+                $(event.target).parent().next().append(createInboundCommunicationMessage($(event.target).next().val()));
+            });
+
+
+            $(this).on("click", ".outbound-communication-add", function() {
+                $("#outbound-communication").append(createOutboundCommunication());
+            });
+            $(this).on("click", ".outbound-communication-collaborator-add", function(event) {
+                $(event.target).parent().next().append(createOutboundCommunicationCollaborator($(event.target).next().val()));
+            });
+            $(this).on("click", ".outbound-communication-message-add", function(event) {
+                $(event.target).parent().next().append(createOutboundCommunicationMessage($(event.target).next().val()));
+            });
+
+            $("#save").click(function(event) {
+                event.preventDefault();
+                let obj = $("#bcc-form").serializeJSON({ useIntKeysAsArrayIndex: true});
+                let json = JSON.stringify(obj);
+                let url = "/save?id=[[${id}]]";
+                if ([[${id}]] !== 0) {
+                    url += "&version=[[${version}]]";
+                }
+                jQuery.ajax({
+                    url: url,
+                    type: "POST",
+                    data: json,
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    success: function(response, textStatus, jqXHR) {
+                        console.log(response);
+                        window.location.href = response.url;
+                    },
+                    error: function(response, textStatus, jqXHR) {
+                        if (response.status >= 400 && response.status < 500) {
+                            createAlert($.parseJSON(response.responseText).detail, "warning", 7000);
+                        } else {
+                            createAlert($.parseJSON(response.responseText).detail, "danger", 7000);
+                        }
+                    }
+                });
+                return false;
+            });
+        });
+    </script>
+</head>
+<body>
+<div id="wrap">
+    <th:block th:insert="canvas/_generate.html :: #generate-canvas-form"></th:block>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="/">BCC Management</a>
+            <ul class="nav">
+                <li class="nav-item"><a class="nav-link" id="save" href="#">Save</a></li>
+                <li class="nav-item"><a class="nav-link" data-bs-toggle="modal" data-bs-target="#generate-canvas-form" href="#">Generate</a></li>
+            </ul>
+        </div>
+    </nav>
+    <div id="alerts">
+    </div>
+    <div class="jumbotron d-flex align-items-center min-vh-100 mb-4">
+        <div id="container" class="container mx-auto text-center border border-secondary">
+            <form id="bcc-form">
+                <div class="row">
+                    <div class="col-6 p-2 border border-secondary-subtle">
+                        <h5 class="text-start">
+                            Name
+                            <small class="text-body-secondary">
+                                <label>
+                                    <input type="text" name="name" class="form-control" th:value="${boundedContext.name}" />
+                                </label>
+                            </small>
+                        </h5>
+                    </div>
+                    <div class="col-6 p-2 border border-secondary-subtle bs-warning-bg-subtle">
+                        <small>github.com/ddd-crew/bounded-context-generatedCanvas v5</small>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4 border border-secondary-subtle">
+                        <h5 class="text-start">Purpose</h5>
+                        <label>
+                            <textarea name="purpose" class="form-control" cols="50" rows="5">[[${boundedContext.purpose}]]</textarea>
+                        </label>
+                    </div>
+                    <div class="col-5 border border-secondary-subtle">
+                        <h5 class="text-start">Strategic Classification</h5>
+                        <div class="row">
+                            <div class="col-4">
+                                <h6 class="text-start">Domain</h6>
+                                <div class="alert alert-warning shadow p-3 mb-5" role="alert">
+                                    <label>
+                                        <select class="form-control" name="strategicClassification[domain]">
+                                            <option value="CORE" th:selected="${'CORE' == boundedContext?.strategicClassification?.domain?.name()}">Core</option>
+                                            <option value="SUPPORTING" th:selected="${'SUPPORTING' == boundedContext?.strategicClassification?.domain?.name()}">Supporting</option>
+                                            <option value="GENERIC" th:selected="${'GENERIC' == boundedContext?.strategicClassification?.domain?.name()}">Generic</option>
+                                            <option value="OTHER" th:selected="${'OTHER' == boundedContext?.strategicClassification?.domain?.name()}">Other</option>
+                                        </select>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <h6 class="text-start">Business Model</h6>
+                                <div class="alert alert-warning shadow p-3 mb-5" role="alert">
+                                    <label>
+                                        <select class="form-control" name="strategicClassification[businessModel]">
+                                            <option value="REVENUE" th:selected="${'REVENUE' == boundedContext?.strategicClassification?.businessModel?.name()}">Revenue</option>
+                                            <option value="ENGAGEMENT" th:selected="${'ENGAGEMENT' == boundedContext?.strategicClassification?.businessModel?.name()}">Engagement</option>
+                                            <option value="COMPLIANCE" th:selected="${'COMPLIANCE' == boundedContext?.strategicClassification?.businessModel?.name()}">Compliance</option>
+                                            <option value="COST_REDUCTION" th:selected="${'COST_REDUCTION' == boundedContext?.strategicClassification?.businessModel?.name()}">Cost reduction</option>
+                                            <option value="OTHER" th:selected="${'OTHER' == boundedContext?.strategicClassification?.businessModel?.name()}">Other</option>
+                                        </select>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <h6 class="text-start">Evolution</h6>
+                                <div class="alert alert-warning shadow p-3 mb-5" role="alert">
+                                    <label>
+                                        <select class="form-control" name="strategicClassification[evolution]">
+                                            <option value="GENESIS" th:selected="${'GENESIS' == boundedContext?.strategicClassification?.evolution?.name()}">Genesis</option>
+                                            <option value="CUSTOM_BUILT" th:selected="${'CUSTOM_BUILT' == boundedContext?.strategicClassification?.evolution?.name()}">Custom built</option>
+                                            <option value="PRODUCT" th:selected="${'PRODUCT' == boundedContext?.strategicClassification?.evolution?.name()}">Product</option>
+                                            <option value="COMMODITY" th:selected="${'COMMODITY' == boundedContext?.strategicClassification?.evolution?.name()}">Commodity</option>
+                                            <option value="OTHER" th:selected="${'OTHER '== boundedContext?.strategicClassification?.evolution?.name()}">Other</option>
+                                        </select>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-3 border border-secondary-subtle">
+                        <h5 class="text-start">Domain Roles</h5>
+                        <div class="row">
+                            <div class="row">
+                                <div class="col-12">
+                                    <h6 class="text-start">Role types</h6>
+                                    <div class="alert alert-warning shadow p-3 mb-5" role="alert">
+                                        <label>
+                                            <select name="domainRoles[roleTypes][]" multiple="multiple" size="3" class="form-control">
+                                                <option value="SPECIFICATION" th:selected="${boundedContext?.domainRoles?.roleTypes?.contains(T(net.adam85w.ddd.boundedcontextcanvas.model.domainroles.RoleType).SPECIFICATION)}">Specification/Draft Model</option>
+                                                <option value="EXECUTION_MODEL" th:selected="${boundedContext?.domainRoles?.roleTypes?.contains(T(net.adam85w.ddd.boundedcontextcanvas.model.domainroles.RoleType).EXECUTION_MODEL)}">Execution Model</option>
+                                                <option value="ANALYSIS" th:selected="${boundedContext?.domainRoles?.roleTypes?.contains(T(net.adam85w.ddd.boundedcontextcanvas.model.domainroles.RoleType).ANALYSIS)}">Analysis/Audit Model</option>
+                                                <option value="APPROVER" th:selected="${boundedContext?.domainRoles?.roleTypes?.contains(T(net.adam85w.ddd.boundedcontextcanvas.model.domainroles.RoleType).APPROVER)}">Approver</option>
+                                                <option value="ENFORCER" th:selected="${boundedContext?.domainRoles?.roleTypes?.contains(T(net.adam85w.ddd.boundedcontextcanvas.model.domainroles.RoleType).ENFORCER)}">Enforcer</option>
+                                                <option value="OCTOPUS_ENFORCER" th:selected="${boundedContext?.domainRoles?.roleTypes?.contains(T(net.adam85w.ddd.boundedcontextcanvas.model.domainroles.RoleType).OCTOPUS_ENFORCER)}">Octopus Enforcer</option>
+                                                <option value="GATEWAY" th:selected="${boundedContext?.domainRoles?.roleTypes?.contains(T(net.adam85w.ddd.boundedcontextcanvas.model.domainroles.RoleType).GATEWAY)}">Gateway</option>
+                                                <option value="GATEWAY_INTERCHANGE" th:selected="${boundedContext?.domainRoles?.roleTypes?.contains(T(net.adam85w.ddd.boundedcontextcanvas.model.domainroles.RoleType).GATEWAY_INTERCHANGE)}">Gateway Interchange</option>
+                                                <option value="DOGFOOD_CONTEXT" th:selected="${boundedContext?.domainRoles?.roleTypes?.contains(T(net.adam85w.ddd.boundedcontextcanvas.model.domainroles.RoleType).DOGFOOD_CONTEXT)}">Dogfood Context</option>
+                                                <option value="BUBBLE_CONTEXT" th:selected="${boundedContext?.domainRoles?.roleTypes?.contains(T(net.adam85w.ddd.boundedcontextcanvas.model.domainroles.RoleType).BUBBLE_CONTEXT)}">Bubble Context</option>
+                                                <option value="AUTONOMOUS_BUBBLE" th:selected="${boundedContext?.domainRoles?.roleTypes?.contains(T(net.adam85w.ddd.boundedcontextcanvas.model.domainroles.RoleType).AUTONOMOUS_BUBBLE)}">Autonomous Bubble</option>
+                                                <option value="BRAIN_CONTEXT" th:selected="${boundedContext?.domainRoles?.roleTypes?.contains(T(net.adam85w.ddd.boundedcontextcanvas.model.domainroles.RoleType).BRAIN_CONTEXT)}">Brain Context (likely anti-pattern</option>
+                                                <option value="FUNNEL_CONTEXT" th:selected="${boundedContext?.domainRoles?.roleTypes?.contains(T(net.adam85w.ddd.boundedcontextcanvas.model.domainroles.RoleType).FUNNEL_CONTEXT)}">Funnel Context</option>
+                                                <option value="ENGAGEMENT_CONTEXT" th:selected="${boundedContext?.domainRoles?.roleTypes?.contains(T(net.adam85w.ddd.boundedcontextcanvas.model.domainroles.RoleType).ENGAGEMENT_CONTEXT)}">Engagement Context</option>
+                                                <option value="OTHER" th:selected="${boundedContext?.domainRoles?.roleTypes?.contains(T(net.adam85w.ddd.boundedcontextcanvas.model.domainroles.RoleType).OTHER)}">Other</option>
+                                            </select>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4">
+                        <h5 class="text-start">Inbound Communication &nbsp; <i title="add verification metric" class="bi bi-journal-plus add clickable inbound-communication-add"></i></h5>
+                        <ul id="inbound-communication" class="input">
+                            <li class="text-start" style="border-bottom: 2px solid #eee" th:if="${boundedContext?.inboundCommunication == null || boundedContext?.inboundCommunication?.isEmpty()}">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="m-1">
+                                            <h6>Collaborators &nbsp;
+                                                <i title="add collaborator" class="bi bi-journal-plus add clickable inbound-communication-collaborator-add"></i>
+                                                <input type="hidden" name="inboundCommunicationIndex:skip" value="0" />
+                                            </h6>
+                                            <ul class="input">
+                                            <li>
+                                                <div class="input-group mb-2">
+                                                    <div class="col-9">
+                                                        <select name="inboundCommunication[0][collaborators][][type]" class="form-control">
+                                                            <option value="BOUNDED_CONTEXT" title="Bounded Context">Bounded Context</option>
+                                                            <option value="EXTERNAL_SYSTEM" title="External System">External System</option>
+                                                            <option value="FRONTEND" title="Frontend">Frontend</option>
+                                                            <option value="USER_INTERACTION" title="Direct User Interaction">Direct User Interaction</option>
+                                                            <option value="OTHER" title="Other">Other</option>
+                                                        </select>
+                                                        <input type="text" name="inboundCommunication[0][collaborators][][name]" class="form-control" />
+                                                    </div>
+                                                    <span class="col-3 input-group-text bi bi-journal-minus remove clickable"></span>
+                                                </div>
+                                            </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="m-1">
+                                            <h6>Messages &nbsp;
+                                                <i title="add message" class="bi bi-journal-plus add clickable inbound-communication-message-add"></i>
+                                                <input type="hidden" name="inboundCommunicationIndex:skip" value="0" />
+                                            </h6>
+                                            <ul class="input">
+                                                <li>
+                                                    <div class="input-group mb-2">
+                                                        <div class="col-9">
+                                                            <select name="inboundCommunication[0][messages][][type]" class="form-control">
+                                                                <option value="QUERY" title="Query">Query</option>
+                                                                <option value="COMMAND" title="Command">Command</option>
+                                                                <option value="EVENT" title="Event">Event</option>
+                                                            </select>
+                                                            <input type="text" name="inboundCommunication[0][messages][][name]" class="form-control" />
+                                                        </div>
+                                                        <span class="col-3 input-group-text bi bi-journal-minus remove clickable"></span>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12 remove-communication">
+                                        <i class="bi bi-journal-minus remove clickable"></i>
+                                    </div>
+                                </div>
+                            </li>
+                            <th:block th:if="${!boundedContext.inboundCommunication.isEmpty()}">
+                            <li class="text-start" style="border-bottom: 2px solid #eee" th:each="communication, iterator: ${boundedContext.inboundCommunication}">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="m-1">
+                                            <h6>Collaborators &nbsp;
+                                                <i title="add collaborator" class="bi bi-journal-plus add clickable inbound-communication-collaborator-add"></i>
+                                                <input type="hidden" name="inboundCommunicationIndex:skip" th:value="${iterator.index}" />
+                                            </h6>
+                                            <ul class="input">
+                                                <li th:each="collaborator: ${communication.collaborators}">
+                                                    <div class="input-group mb-2">
+                                                        <div class="col-9">
+                                                            <select th:name="'inboundCommunication[' + ${iterator.index} + '][collaborators][][type]'" class="form-control">
+                                                                <option value="BOUNDED_CONTEXT" title="Bounded Context" th:selected="${'BOUNDED_CONTEXT' == collaborator.type?.name()}">Bounded Context</option>
+                                                                <option value="EXTERNAL_SYSTEM" title="External System" th:selected="${'EXTERNAL_SYSTEM' == collaborator.type?.name()}">External System</option>
+                                                                <option value="FRONTEND" title="Frontend" th:selected="${'FRONTEND' == collaborator.type?.name()}">Frontend</option>
+                                                                <option value="USER_INTERACTION" title="Direct User Interaction" th:selected="${'USER_INTERACTION' == collaborator.type?.name()}">Direct User Interaction</option>
+                                                                <option value="OTHER" title="Other" th:selected="${'OTHER' == collaborator.type?.name()}">Other</option>
+                                                            </select>
+                                                            <input type="text" th:name="'inboundCommunication[' + ${iterator.index} + '][collaborators][][name]'" th:value="${collaborator.name}" class="form-control" />
+                                                        </div>
+                                                        <span class="col-3 input-group-text bi bi-journal-minus remove clickable"></span>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="m-1">
+                                            <h6>Messages &nbsp;
+                                                <i title="add message" class="bi bi-journal-plus add clickable inbound-communication-message-add"></i>
+                                                <input type="hidden" name="inboundCommunicationIndex:skip" th:value="${iterator.index}" />
+                                            </h6>
+                                            <ul class="input">
+                                                <li th:each="message: ${communication.messages}">
+                                                    <div class="input-group mb-2">
+                                                        <div class="col-9">
+                                                            <select th:name="'inboundCommunication[' + ${iterator.index} + '][messages][][type]'" class="form-control">
+                                                                <option value="QUERY" title="Query" th:selected="${'QUERY' == message.type?.name()}">Query</option>
+                                                                <option value="COMMAND" title="Command" th:selected="${'COMMAND' == message.type?.name()}">Command</option>
+                                                                <option value="EVENT" title="Event" th:selected="${'EVENT' == message.type?.name()}">Event</option>
+                                                            </select>
+                                                            <input type="text" th:name="'inboundCommunication[' + ${iterator.index} + '][messages][][name]'" th:value="${message.name}" class="form-control" />
+                                                        </div>
+                                                        <span class="col-3 input-group-text bi bi-journal-minus remove clickable"></span>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12 remove-communication">
+                                        <i class="bi bi-journal-minus remove clickable"></i>
+                                    </div>
+                                </div>
+                            </li>
+                            </th:block>
+                        </ul>
+                    </div>
+                    <div class="col-4 border border-secondary-subtle">
+                        <div class="m-2">
+                            <h5>Ubiquitous Language &nbsp; <i title="add ubiquitous language" class="bi bi-journal-plus add clickable ubiquitous-language-add"></i></h5>
+                            <small class="fw-light">Context specific domain terminology</small>
+                            <ul id="ubiquitous-language" class="input">
+                                <li class="text-start" th:if="${boundedContext?.ubiquitousLanguage == null || boundedContext?.ubiquitousLanguage?.isEmpty()}">
+                                    <div class="input-group mb-2">
+                                        <div style="width:89.5%;">
+                                            <input type="text" class="form-control" name="ubiquitousLanguage[][name]" title="name" />
+                                            <textarea class="form-control" name="ubiquitousLanguage[][description]" title="description"></textarea>
+                                        </div>
+                                        <span class="input-group-text bi bi-journal-minus remove clickable"></span>
+                                    </div>
+                                </li>
+                                <li class="text-start" th:each="ubiquitousLanguage, iterator: ${boundedContext.ubiquitousLanguage}">
+                                    <div class="input-group mb-2">
+                                        <div style="width:89.5%;">
+                                            <input type="text" class="form-control" th:name="${'ubiquitousLanguage[' + iterator.index + '][name]'}" title="name" th:value="${ubiquitousLanguage.name}" />
+                                            <textarea class="form-control" th:name="${'ubiquitousLanguage[' + iterator.index + '][description]'}" title="description">[[${ubiquitousLanguage.description}]]</textarea>
+                                        </div>
+                                        <span class="input-group-text bi bi-journal-minus remove clickable"></span>
+                                    </div>
+                                </li>
+                            </ul>
+                            <h5>Business Decisions &nbsp; <i title="add business decision" class="bi bi-journal-plus add clickable business-decision-add"></i></h5>
+                            <small class="fw-light">Key business rules, policies and decisions</small>
+                            <ul id="business-decisions" class="input">
+                                <li class="text-start" th:if="${boundedContext?.businessDecisions == null || boundedContext?.businessDecisions?.isEmpty()}">
+                                    <div class="input-group mb-2">
+                                        <textarea class="form-control" name="businessDecisions[]"></textarea>
+                                        <span class="input-group-text bi bi-journal-minus remove clickable"></span>
+                                    </div>
+                                </li>
+                                <li class="text-start" th:each="businessDecision: ${boundedContext.businessDecisions}">
+                                    <div class="input-group mb-2">
+                                        <textarea class="form-control" name="businessDecisions[]">[[${businessDecision}]]</textarea>
+                                        <span class="input-group-text bi bi-journal-minus remove clickable"></span>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <h5 class="text-start">Outbound Communication &nbsp; <i title="add verification metric" class="bi bi-journal-plus add clickable outbound-communication-add"></i></h5>
+                        <ul id="outbound-communication" class="input">
+                            <li class="text-start" style="border-bottom: 2px solid #eee" th:if="${boundedContext?.outboundCommunication == null || boundedContext?.outboundCommunication?.isEmpty()}">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="m-1">
+                                            <h6>Messages &nbsp;
+                                                <i title="add message" class="bi bi-journal-plus add clickable outbound-communication-message-add"></i>
+                                                <input type="hidden" name="outboundCommunicationIndex:skip" value="0" />
+                                            </h6>
+                                            <ul class="input">
+                                                <li>
+                                                    <div class="input-group mb-2">
+                                                        <div class="col-9">
+                                                            <select name="outboundCommunication[0][messages][][type]" class="form-control">
+                                                                <option value="QUERY" title="Query">Query</option>
+                                                                <option value="COMMAND" title="Command">Command</option>
+                                                                <option value="EVENT" title="Event">Event</option>
+                                                            </select>
+                                                            <input type="text" name="outboundCommunication[0][messages][][name]" class="form-control" />
+                                                        </div>
+                                                        <span class="col-3 input-group-text bi bi-journal-minus remove clickable"></span>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="m-1">
+                                            <h6>Collaborators &nbsp;
+                                                <i title="add collaborator" class="bi bi-journal-plus add clickable outbound-communication-collaborator-add"></i>
+                                                <input type="hidden" name="outboundCommunicationIndex:skip" value="0" />
+                                            </h6>
+                                            <ul class="input">
+                                                <li>
+                                                    <div class="input-group mb-2">
+                                                        <div class="col-9">
+                                                            <select name="outboundCommunication[0][collaborators][][type]" class="form-control">
+                                                                <option value="BOUNDED_CONTEXT" title="Bounded Context">Bounded Context</option>
+                                                                <option value="EXTERNAL_SYSTEM" title="External System">External System</option>
+                                                                <option value="FRONTEND" title="Frontend">Frontend</option>
+                                                                <option value="USER_INTERACTION" title="Direct User Interaction">Direct User Interaction</option>
+                                                                <option value="OTHER" title="Other">Other</option>
+                                                            </select>
+                                                            <input type="text" name="outboundCommunication[0][collaborators][][name]" class="form-control" />
+                                                        </div>
+                                                        <span class="col-3 input-group-text bi bi-journal-minus remove clickable"></span>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12 remove-communication">
+                                        <i class="bi bi-journal-minus remove clickable"></i>
+                                    </div>
+                                </div>
+                            </li>
+                            <th:block th:if="${!boundedContext.outboundCommunication.isEmpty()}">
+                                <li class="text-start" style="border-bottom: 2px solid #eee" th:each="communication, iterator: ${boundedContext.outboundCommunication}">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <div class="m-1">
+                                                <h6>Messages &nbsp;
+                                                    <i title="add message" class="bi bi-journal-plus add clickable outbound-communication-message-add"></i>
+                                                    <input type="hidden" name="outboundCommunicationIndex:skip" th:value="${iterator.index}" />
+                                                </h6>
+                                                <ul class="input">
+                                                    <li th:each="message: ${communication.messages}">
+                                                        <div class="input-group mb-2">
+                                                            <div class="col-9">
+                                                                <select th:name="'outboundCommunication[' + ${iterator.index} + '][messages][][type]'" class="form-control">
+                                                                    <option value="QUERY" title="Query" th:selected="${'QUERY' == message.type?.name()}">Query</option>
+                                                                    <option value="COMMAND" title="Command" th:selected="${'COMMAND' == message.type?.name()}">Command</option>
+                                                                    <option value="EVENT" title="Event" th:selected="${'EVENT' == message.type?.name()}">Event</option>
+                                                                </select>
+                                                                <input type="text" th:name="'outboundCommunication[' + ${iterator.index} + '][messages][][name]'" th:value="${message.name}" class="form-control" />
+                                                            </div>
+                                                            <span class="col-3 input-group-text bi bi-journal-minus remove clickable"></span>
+                                                        </div>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="m-1">
+                                                <h6>Collaborators &nbsp;
+                                                    <i title="add collaborator" class="bi bi-journal-plus add clickable outbound-communication-collaborator-add"></i>
+                                                    <input type="hidden" name="outboundCommunicationIndex:skip" th:value="${iterator.index}" />
+                                                </h6>
+                                                <ul class="input">
+                                                    <li th:each="collaborator: ${communication.collaborators}">
+                                                        <div class="input-group mb-2">
+                                                            <div class="col-9">
+                                                                <select th:name="'outboundCommunication[' + ${iterator.index} + '][collaborators][][type]'" class="form-control">
+                                                                    <option value="BOUNDED_CONTEXT" title="Bounded Context" th:selected="${'BOUNDED_CONTEXT' == collaborator.type?.name()}">Bounded Context</option>
+                                                                    <option value="EXTERNAL_SYSTEM" title="External System" th:selected="${'EXTERNAL_SYSTEM' == collaborator.type?.name()}">External System</option>
+                                                                    <option value="FRONTEND" title="Frontend" th:selected="${'FRONTEND' == collaborator.type?.name()}">Frontend</option>
+                                                                    <option value="USER_INTERACTION" title="Direct User Interaction" th:selected="${'USER_INTERACTION' == collaborator.type?.name()}">Direct User Interaction</option>
+                                                                    <option value="OTHER" title="Other" th:selected="${'OTHER' == collaborator.type?.name()}">Other</option>
+                                                                </select>
+                                                                <input type="text" th:name="'outboundCommunication[' + ${iterator.index} + '][collaborators][][name]'" th:value="${collaborator.name}" class="form-control" />
+                                                            </div>
+                                                            <span class="col-3 input-group-text bi bi-journal-minus remove clickable"></span>
+                                                        </div>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-12 remove-communication">
+                                            <i class="bi bi-journal-minus remove clickable"></i>
+                                        </div>
+                                    </div>
+                                </li>
+                            </th:block>
+                        </ul>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-5 border border-secondary-subtle">
+                        <h5 class="text-start">Assumptions &nbsp; <i title="add assumption" class="bi bi-journal-plus add clickable assumption-add"></i></h5>
+                        <ul id="assumptions" class="input">
+                            <li class="text-start" th:if="${boundedContext?.assumptions == null || boundedContext?.assumptions?.isEmpty()}">
+                                <div class="input-group mb-2">
+                                    <input type="text" class="form-control" name="assumptions[]" />
+                                    <span class="input-group-text bi bi-journal-minus remove clickable"></span>
+                                </div>
+                            </li>
+                            <li class="text-start" th:each="assumption: ${boundedContext.assumptions}">
+                                <div class="input-group mb-2">
+                                    <input type="text" class="form-control" name="assumptions[]" th:value="${assumption}" />
+                                    <span class="input-group-text bi bi-journal-minus remove clickable"></span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-4 border border-secondary-subtle">
+                        <h5 class="text-start">Verification Metrics &nbsp; <i title="add verification metric" class="bi bi-journal-plus add clickable verification-metric-add"></i></h5>
+                        <ul id="verification-metrics" class="input">
+                            <li class="text-start" th:if="${boundedContext?.verificationMetrics == null || boundedContext?.verificationMetrics?.isEmpty()}">
+                                <div class="input-group mb-2">
+                                    <input type="text" class="form-control" name="verificationMetrics[]" />
+                                    <span class="input-group-text bi bi-journal-minus remove clickable"></span>
+                                </div>
+                            </li>
+                            <li class="text-start" th:each="verificationMetric: ${boundedContext.verificationMetrics}">
+                                <div class="input-group mb-2">
+                                    <input type="text" class="form-control" name="verificationMetrics[]" th:value="${verificationMetric}" />
+                                    <span class="input-group-text bi bi-journal-minus remove clickable"></span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-3 border border-secondary-subtle">
+                        <h5 class="text-start">Open Questions &nbsp; <i title="add open question" class="bi bi-journal-plus add clickable open-question-add"></i></h5>
+                        <ul id="open-questions" class="input">
+                            <li class="text-start" th:if="${boundedContext?.openQuestions == null || boundedContext?.openQuestions?.isEmpty()}">
+                                <div class="input-group mb-2">
+                                    <input type="text" class="form-control" name="openQuestions[]" />
+                                    <span class="input-group-text bi bi-journal-minus remove clickable"></span>
+                                </div>
+                            </li>
+                            <li class="text-start" th:each="openQuestion: ${boundedContext.openQuestions}">
+                                <div class="input-group mb-2">
+                                    <input type="text" class="form-control" name="openQuestions[]" th:value="${openQuestion}" />
+                                    <span class="input-group-text bi bi-journal-minus remove clickable"></span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6 border border-secondary-subtle text-start">
+                    </div>
+                    <div class="col-6 border border-secondary-subtle text-end">
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div id="push"></div>
+</div>
+<div id="footer">
+    <div class="container">
+        <p>&copy; [[${#temporals.format(#temporals.createNow(), "yyyy")}]] <a href="https://github.com/adam85w/bounded-context-canvas-management">Bounded Context Canvas Management</a></p>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>Bounded Context Canvas Management</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="/css/bootstrap-icons.min.css" rel="stylesheet" />
+    <link href="/css/application.css" rel="stylesheet" />
+    <script type="text/javascript" src="/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+<div class="modal fade" id="generate-canvas-form" tabindex="-1" aria-hidden="true">
+    <script type="application/javascript">
+        function obtainTemplateNames(templateType) {
+            $("select[name='templateName'] > option").hide();
+            $("select[name='templateName'] > option").filter("." + templateType).show();
+            $("select[name='templateName'] > option").filter("." + templateType).first().attr("selected", "selected");
+        }
+        $(document).ready(function() {
+            obtainTemplateNames($("select[name='templateType']").val());
+            $("select[name='templateType']").on("change", function(event) {
+                obtainTemplateNames($(this).val());
+                $(this).focus();
+            })
+            $("#generate").on("click", function(event) {
+                event.preventDefault();
+                let templateType = $("select[name='templateType'] > option:selected").val();
+                let templateName = $("select[name='templateName'] > option:selected").val();
+                let id = $("input[name='id']").val();
+                $("#generate-canvas-form").modal('hide')
+                generate(templateType, templateName, id);
+                return false;
+            });
+        });
+    </script>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5">Generate canvas</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <input name="id" type="hidden" />
+                    <div class="mb-3">
+                        <label class="col-form-label">Template type:</label>
+                        <select name="templateType" class="form-control">
+                            <option th:each="templateType: ${templates.keySet()}" th:value="${templateType}">[[${templateType}]]</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="col-form-label">Template name:</label>
+                        <select name="templateName" class="form-control">
+                            <th:block th:each="templateType: ${templates.keySet()}">
+                                <option th:each="templateName: ${templates.get(templateType)}" th:class="${templateType}" th:value="${templateName}">[[${templateName}]]</option>
+                            </th:block>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="generate">Generate</button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

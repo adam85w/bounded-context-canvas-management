@@ -1,0 +1,157 @@
+{
+  "name": "Scoring",
+  "purpose": "Provide a fully automated, highly trustable and reliable assessment\nof the approvability of a credit application for retail mortgage loans.",
+  "strategicClassification": {
+    "domain": "CORE",
+    "businessModel": "COMPLIANCE",
+    "evolution": "CUSTOM_BUILT"
+  },
+  "domainRoles": {
+    "roleTypes": [
+      "EXECUTION_MODEL"
+    ]
+  },
+  "inboundCommunication": [
+    {
+      "collaborators": [
+        {
+          "name": "Application Entry",
+          "type": "BOUNDED_CONTEXT"
+        }
+      ],
+      "messages": [
+        {
+          "name": "Application submitted",
+          "type": "COMMAND"
+        }
+      ]
+    },
+    {
+      "collaborators": [
+        {
+          "name": "Document Check",
+          "type": "BOUNDED_CONTEXT"
+        }
+      ],
+      "messages": [
+        {
+          "name": "Application marked as checked",
+          "type": "COMMAND"
+        }
+      ]
+    },
+    {
+      "collaborators": [
+        {
+          "name": "Real Estate Rating",
+          "type": "BOUNDED_CONTEXT"
+        }
+      ],
+      "messages": [
+        {
+          "name": "Real Estate ratios calculated",
+          "type": "COMMAND"
+        }
+      ]
+    }
+  ],
+  "outboundCommunication": [
+    {
+      "messages": [
+        {
+          "name": "Pre Scoring Green",
+          "type": "COMMAND"
+        }
+      ],
+      "collaborators": [
+        {
+          "name": "Document Check",
+          "type": "BOUNDED_CONTEXT"
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "name": "Pre Scoring Red",
+          "type": "COMMAND"
+        }
+      ],
+      "collaborators": [
+        {
+          "name": "Credit Decision",
+          "type": "BOUNDED_CONTEXT"
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "name": "Main Scoring Green",
+          "type": "COMMAND"
+        },
+        {
+          "name": "Main Scoring Red",
+          "type": "COMMAND"
+        }
+      ],
+      "collaborators": [
+        {
+          "name": "Credit Decision",
+          "type": "BOUNDED_CONTEXT"
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "name": "Retrieve Account Balance",
+          "type": "QUERY"
+        }
+      ],
+      "collaborators": [
+        {
+          "name": "Core Banking System",
+          "type": "EXTERNAL_SYSTEM"
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "name": "Determine creditworthiness od applicant",
+          "type": "EVENT"
+        }
+      ],
+      "collaborators": [
+        {
+          "name": "Credit Agency",
+          "type": "EXTERNAL_SYSTEM"
+        }
+      ]
+    }
+  ],
+  "ubiquitousLanguage": [
+    {
+      "name": "Rule Cluster",
+      "description": "Grouping of scoring rules (ko criteria & point based) into clusters that can be independently scored"
+    }
+  ],
+  "businessDecisions": [
+    "KO Criteria",
+    "Point Based Rules",
+    "Scoring Result: 1 KO Criteria red >= 120 point and no KO: green"
+  ],
+  "assumptions": [
+    "Pre- and Main Scoring will run on the same rules for the forseeable future",
+    "We will only work with one credit agency",
+    "There will be a high stability in the area of real estate ratios"
+  ],
+  "verificationMetrics": [
+    "95% of changes will affect both pre- and main scoring and 90% only on rule cluster at a time",
+    "75% of changes to the application form will have no impact on Scoring"
+  ],
+  "openQuestions": [
+    "Should there be a score color yellow for errors?"
+  ]
+}

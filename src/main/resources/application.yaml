@@ -1,0 +1,44 @@
+server:
+  port: 8084
+spring:
+  application:
+    name: bounded-context-canvas-management
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    database-platform: org.hibernate.dialect.MariaDBDialect
+  datasource:
+    url: jdbc:mariadb://mariadb:3306/canvases
+    username: canvas
+    password: letmein1
+    driver-class-name: org.mariadb.jdbc.Driver
+  liquibase:
+    change-log: classpath:db/changelog/changelog.xml
+    enabled: true
+    database-change-log-table: liquibase_database_change_log
+    database-change-log-lock-table: liquibase_database_change_log_lock
+    drop-first: false
+    liquibase-schema: canvases
+application:
+  integration:
+    generator:
+      canvas:
+        url: http://bounded-context-canvas:8083/api/bounded-context-canvas/
+        connection-timeout: 100
+        read-timeout: 2000
+        cache:
+          evict-time: 300000 # five minutes
+      template:
+        url: http://bounded-context-canvas:8083/actuator/context
+        connection-timeout: 100
+        read-timeout: 500
+        cache:
+          evict-time: 3600000 # one hour
+  bounded-context:
+    example:
+      file-name: example.json
+  diagram:
+    url: "https://www.plantuml.com/plantuml/uml/"
+  operation-notification:
+    scheduler: 1000

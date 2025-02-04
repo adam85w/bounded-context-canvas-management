@@ -1,0 +1,41 @@
+version: '3'
+services:
+  bounded-context-canvas-management:
+    image: localhost/adam85w/bounded-context-canvas-management:1.0.0-beta-1
+    restart: unless-stopped
+    ports:
+      - "8084:8084"
+    depends_on:
+      mariadb:
+        condition: service_completed_successfully
+      bounded-context-canvas:
+        condition: service_completed_successfully
+  bounded-context-canvas:
+    image: docker.io/adam85w/bounded-context-canvas:3.2.1
+    restart: unless-stopped
+    ports:
+      - "8083:8083"
+  phpmyadmin:
+    image: docker.io/phpmyadmin
+    restart: unless-stopped
+    environment:
+      PMA_HOST: mariadb
+      PMA_USER: canvas
+      PMA_PASSWORD: letmein1
+    ports:
+      - "8082:80"
+    depends_on:
+      mariadb:
+        condition: service_completed_successfully
+  mariadb:
+    image: docker.io/mariadb:latest
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: letmein1
+      MYSQL_DATABASE: canvases
+      MYSQL_USER: canvas
+      MYSQL_PASSWORD: letmein1
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./data:/var/lib/mysql

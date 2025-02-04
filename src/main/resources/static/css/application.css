@@ -1,0 +1,46 @@
+/* form */
+i {
+    font-size: 22px;
+}
+i.add {
+    color: green;
+}
+span.remove, i.remove {
+    color: red;
+}
+i.clickable, span.clickable {
+    cursor: pointer;
+}
+ul.input {
+    list-style-type: none;
+    padding-left: 0;
+}
+.remove-communication {
+    text-align: center;
+}
+input[name='name'] {
+    width: 500px;
+}
+/* sticky footer */
+html, body {
+    height: 100%;
+}
+#wrap {
+    min-height: 100%;
+    height: auto !important;
+    height: 100%;
+    margin: 0 auto -60px;
+}
+#push, #footer {
+    height: 60px;
+}
+#footer {
+    background-color: #f5f5f5;
+}
+#footer > div {
+    height: 60px;
+}
+#footer > div > p {
+    text-align: right;
+    line-height: 60px;
+}

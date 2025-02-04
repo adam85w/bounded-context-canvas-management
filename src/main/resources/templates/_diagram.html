@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Bounded Context Canvas Management</title>
+    <meta charset="utf-8">
+    <link href="/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="/css/bootstrap-icons.min.css" rel="stylesheet" />
+    <link href="/css/application.css" rel="stylesheet" />
+    <script type="text/javascript" src="/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+<div id="generate-diagram">
+    <script type="application/javascript">
+        const PLANTUML_DIAGRAM_URL = '[[${@environment.getProperty("application.diagram.url")}]]';
+
+        $(document).ready(function() {
+            $(this).on("click", "#diagram", function() {
+                jQuery.ajax({
+                    type: "GET",
+                    url: "/api/diagrams",
+                    contentType: "plain/text; charset=utf-8",
+                    success: function(data, textStatus, jqXHR) {
+                        window.open(PLANTUML_DIAGRAM_URL + data, '_blank');
+                    }
+                })
+            });
+        });
+    </script>
+</div>
+</body>
+</html>

@@ -1,0 +1,16 @@
+hazelcast:
+  cluster-name: bcc
+  map:
+    canvases:
+      max-idle-seconds: 3600
+      eviction:
+        eviction-policy: LRU
+        max-size-policy: PER_NODE
+        size: 100
+  set:
+    templates:
+      max-size: 1
+  network:
+    join:
+      multicast:
+        enabled: true

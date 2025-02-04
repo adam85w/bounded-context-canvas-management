@@ -1,0 +1,144 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>Bounded Context Canvas Management</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="/css/bootstrap-icons.min.css" rel="stylesheet" />
+    <link href="/css/application.css" rel="stylesheet" />
+    <script type="text/javascript" src="/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript">
+        function createAlert(message, type, ttl) {
+            const alertTemplate = `
+                <div class="auto-closable-alert container alert alert-__type__ alert-dismissible fade show" role="alert">
+                    __message__
+                    <button type="button" class="btn-close text-right" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                `;
+            let alert = alertTemplate.replace("__message__", message).replace("__type__", type);
+            $("#alerts").append(alert);
+            window.setTimeout(function () {
+                $(".auto-closable-alert").alert('close');
+            }, ttl);
+        }
+
+        function generate(templateType, templateName, id) {
+            let url = "/api/canvases?templateType=" + templateType + "&templateName=" + templateName + "&id=" + id;
+            jQuery.ajax ({
+                url: url,
+                type: "PUT",
+                dataType: "html",
+                contentType: "application/json; charset=utf-8",
+                success: function(key, textStatus, jqXHR) {
+                    window.open("/api/canvases?key=" + key, '_blank');
+                },
+                error: function(response, e) {
+                    if (response.status === 400) {
+                        createAlert($.parseJSON(response.responseText).detail, "warning", 7000);
+                    } else {
+                        createAlert($.parseJSON(response.responseText).detail, "danger", 7000);
+                    }
+                }
+            });
+        }
+
+        $(document).ready(function() {
+            $(this).on("click", ".generate", function() {
+                let id = $(this).data('id');
+                $("input[name='id']").val(id);
+            });
+
+            window.setTimeout(function() {
+                $(".auto-closable-alert").alert('close');
+            }, 7000);
+        });
+    </script>
+</head>
+<body>
+<div id="wrap">
+    <nav class="navbar navbar-expand-lg bg-body-tertiary mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="/">BCC Management</a>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a href="/add" class="nav-link">Add a new one</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Fitness functions
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/fitness-functions/circular-dependencies">Circular dependencies</a></li>
+                            <li><a class="dropdown-item" href="/fitness-functions/communications">Communications</a></li>
+                            <li><a class="dropdown-item" href="/fitness-functions/couplings">Couplings</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" id="diagram">Generate diagram</a>
+                    </li>
+                </ul>
+            </div>
+            <form action="/list" class="d-flex" role="search">
+                <input name="searchPhrase" th:value="${searchPhrase}" class="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
+                <button class="btn btn-outline-success" type="submit">Search</button>
+            </form>
+        </div>
+    </nav>
+    <th:block th:insert="canvas/_generate.html :: #generate-canvas-form"></th:block>
+    <div id="alerts">
+        <th:block th:if="${action != null}">
+            <div class="auto-closable-alert container alert alert-success alert-dismissible fade show" role="alert">
+                Bounded Context Canvas with the name: "<strong>[[${canvasName}]]</strong>" was successfully <strong>[[${action.getName()}]]</strong>.
+                <button type="button" class="btn-close text-right" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </th:block>
+        <div class="container alert alert-primary" role="alert" th:if="${canvases.size() == 0 && searchPhrase == null}">
+            You haven't added any bounded context canvases so far. <a href="/add">Here, you can add the first one.</a>
+        </div>
+        <div class="container alert alert-primary" role="alert" th:if="${canvases.size() == 0 && searchPhrase != null}">
+            There is no canvas that fulfills the specified search criteria. <a href="/add">Here, you can add the first one.</a>
+        </div>
+    </div>
+    <div class="jumbotron d-flex min-vh-60" th:if="${canvases.size() != 0}">
+        <div class="container mx-auto text-center border border-secondary m-4">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Created at</th>
+                        <th>Updated at</th>
+                        <th>Options</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="generatedCanvas: ${canvases}">
+                        <td>[[${generatedCanvas.name}]]</td>
+                        <td>[[${#temporals.format(generatedCanvas.createdAt, 'dd-MM-yyyy HH:mm')}]]</td>
+                        <td>
+                            <th:block th:if="${generatedCanvas.updatedAt == null}">--</th:block>
+                            <th:block th:if="${generatedCanvas.updatedAt != null}">[[${#temporals.format(generatedCanvas.updatedAt, 'dd-MM-yyyy HH:mm')}]]</th:block>
+                        </td>
+                        <td>
+                            <a th:href="${'/edit?id=' + generatedCanvas.id}" title="edit"><i class="bi bi-journal-text"></i></a>
+                            <a th:href="${'/clone?id=' + generatedCanvas.id}" title="clone"><i class="bi bi-view-stacked"></i></a>
+                            <a data-bs-toggle="modal" th:data-id="${generatedCanvas.id}"  data-bs-target="#generate-canvas-form" href="#" title="generate" class="generate"><i class="bi bi-gear"></i></a>
+                            <a th:href="${'/delete?id=' + generatedCanvas.id + '&amp;version=' + generatedCanvas.version}" title="delete"><i class="bi bi-journal-x"></i></a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div id="push"></div>
+</div>
+<div id="footer">
+    <div class="container">
+        <p>&copy; [[${#temporals.format(#temporals.createNow(), "yyyy")}]] <a href="https://github.com/adam85w/bounded-context-canvas-management">Bounded Context Canvas Management</a></p>
+    </div>
+</div>
+<th:block th:insert="_diagram.html :: #generate-diagram"></th:block>
+</body>
+</html>

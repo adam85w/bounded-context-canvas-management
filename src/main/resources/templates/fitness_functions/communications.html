@@ -1,0 +1,79 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>Bounded Context Canvas Management</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="/css/bootstrap-icons.min.css" rel="stylesheet" />
+    <link href="/css/application.css" rel="stylesheet" />
+    <script type="text/javascript" src="/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+<div id="wrap">
+    <nav class="navbar navbar-expand-lg bg-body-tertiary mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="/">BCC Management</a>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a href="/add" class="nav-link">Add a new one</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Fitness functions
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/fitness-functions/circular-dependencies">Circular dependencies</a></li>
+                            <li><a class="dropdown-item" href="/fitness-functions/communications">Communications</a></li>
+                            <li><a class="dropdown-item" href="/fitness-functions/couplings">Couplings</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" id="diagram">Generate diagram</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="jumbotron d-flex min-vh-60">
+        <div class="container mx-auto text-center border border-secondary m-4">
+            <h1>History of measurements</h1>
+            <p th:if="${measurements.isEmpty()}">No measurements have been recorded so far.</p>
+            <table class="table table-striped" th:if="${!measurements.isEmpty()}">
+                <thead>
+                <tr>
+                    <th>Canvas name</th>
+                    <th>Operation type</th>
+                    <th>Queries (percentages)</th>
+                    <th>Commands (percentages)</th>
+                    <th>Events (percentages)</th>
+                    <th>Date</th>
+                </tr>
+                </thead>
+                <tbody>
+                <th:block th:each="measurement, stat: ${measurements}">
+                    <tr>
+                        <td>[[${measurement.getCanvasName()}]]</td>
+                        <td>[[${#strings.toLowerCase(measurement.getOperationType())}]]</td>
+                        <td>[[${measurement.getQueriesAmount()}]] ([[${#numbers.formatDecimal(((100F*measurement.getQueriesAmount())/(measurement.getQueriesAmount()+measurement.getCommandsAmount()+measurement.getEventsAmount())), 2, 2)}]])</td>
+                        <td>[[${measurement.getCommandsAmount()}]] ([[${#numbers.formatDecimal(((100F*measurement.getCommandsAmount())/(measurement.getQueriesAmount()+measurement.getCommandsAmount()+measurement.getEventsAmount())), 2, 2)}]])</td>
+                        <td>[[${measurement.getEventsAmount()}]] ([[${#numbers.formatDecimal(((100F*measurement.getEventsAmount())/(measurement.getQueriesAmount()+measurement.getCommandsAmount()+measurement.getEventsAmount())), 2, 2)}]])</td>
+                        <td>[[${#temporals.format(measurement.getCreatedAt(), 'dd-MM-yyyy HH:mm')}]]</td>
+                    </tr>
+                </th:block>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div id="push"></div>
+</div>
+<div id="footer">
+    <div class="container">
+        <p>&copy; [[${#temporals.format(#temporals.createNow(), "yyyy")}]] <a href="https://github.com/adam85w/bounded-context-canvas-management">Bounded Context Canvas Management</a></p>
+    </div>
+</div>
+<th:block th:insert="_diagram.html :: #generate-diagram"></th:block>
+</body>
+</html>
