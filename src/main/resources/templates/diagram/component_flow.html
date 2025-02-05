@@ -39,34 +39,13 @@
     </nav>
     <div class="jumbotron d-flex min-vh-60">
         <div class="container mx-auto text-center border border-secondary m-4">
-            <h1>History of measurements</h1>
-            <p th:if="${measurements.isEmpty()}">No measurements have been recorded so far.</p>
-            <table class="table table-striped" th:if="${!measurements.isEmpty()}">
-                <thead>
-                <tr>
-                    <th>Canvas name</th>
-                    <th>Operation type</th>
-                    <th>Components</th>
-                    <th>Afferent couplings (ratio)</th>
-                    <th>Efferent couplings (ratio)</th>
-                    <th>Ratio</th>
-                    <th>Date</th>
-                </tr>
-                </thead>
-                <tbody>
-                <th:block th:each="measurement, stat: ${measurements}">
-                    <tr>
-                        <td>[[${measurement.getCanvasName()}]]</td>
-                        <td>[[${#strings.toLowerCase(measurement.getOperationType())}]]</td>
-                        <td>[[${measurement.getComponentsAmount()}]]</td>
-                        <td>[[${measurement.getAfferentCouplingsAmount()}]] ([[${#numbers.formatDecimal(1F*measurement.getAfferentCouplingsAmount()/measurement.getComponentsAmount(), 0, 2)}]])</td>
-                        <td>[[${measurement.getEfferentCouplingsAmount()}]] ([[${#numbers.formatDecimal(1F*measurement.getEfferentCouplingsAmount()/measurement.getComponentsAmount(), 0, 2)}]])</td>
-                        <td>[[${#numbers.formatDecimal((1F*(measurement.getAfferentCouplingsAmount()+measurement.getEfferentCouplingsAmount()))/measurement.getComponentsAmount(), 0, 2)}]]</td>
-                        <td>[[${#temporals.format(measurement.getCreatedAt(), 'dd-MM-yyyy HH:mm')}]]</td>
-                    </tr>
-                </th:block>
-                </tbody>
-            </table>
+            <h1>Diagram component flow</h1>
+            <h2>Source</h2>
+            <pre class="text-start p-3 mb-2 bg-dark text-white">[[${source}]]</pre>
+            <h2>Diagram</h2>
+            <p class="text-start" >
+            <a th:href="${@environment.getProperty('application.diagram.url') + encoded}" target="_blank">Diagram link to the plantuml website</a>
+            </p>
         </div>
     </div>
     <div id="push"></div>

@@ -1,16 +1,15 @@
 package net.adam85w.ddd.boundedcontextcanvas.management.diagram;
 
 import net.sourceforge.plantuml.code.TranscoderUtil;
-import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.io.IOException;
 
-@RestController
-@RequestMapping("/api/diagrams")
+@Controller
+@RequestMapping("/diagram/component-flow")
 class DiagramController {
 
     private final DiagramGenerator generator;
@@ -20,12 +19,11 @@ class DiagramController {
     }
 
     @GetMapping
-    ResponseEntity<String> generate(@RequestParam(name = "integration", defaultValue = "true") boolean integration) throws IOException {
+    ModelAndView generate(ModelAndView modelAndView) throws IOException {
         var diagramSource = generator.generate();
-        if (integration) {
-            return ResponseEntity.ok(TranscoderUtil.getDefaultTranscoder().encode(diagramSource));
-        } else {
-            return ResponseEntity.ok(diagramSource);
-        }
+        modelAndView.addObject("source", diagramSource);
+        modelAndView.addObject("encoded", TranscoderUtil.getDefaultTranscoder().encode(diagramSource));
+        modelAndView.setViewName("diagram/component_flow");
+        return modelAndView;
     }
 }

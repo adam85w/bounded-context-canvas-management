@@ -31,7 +31,7 @@
                         </ul>
                     </li>
                     <li class="nav-item">
-                        <a href="#" class="nav-link" id="diagram">Generate diagram</a>
+                        <a class="nav-link" href="/diagram/component-flow">Generate diagram</a>
                     </li>
                 </ul>
             </div>
@@ -97,6 +97,5 @@
         <p>&copy; [[${#temporals.format(#temporals.createNow(), "yyyy")}]] <a href="https://github.com/adam85w/bounded-context-canvas-management">Bounded Context Canvas Management</a></p>
     </div>
 </div>
-<th:block th:insert="_diagram.html :: #generate-diagram"></th:block>
 </body>
 </html>
