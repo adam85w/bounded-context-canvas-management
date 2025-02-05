@@ -3,8 +3,8 @@ package net.adam85w.ddd.boundedcontextcanvas.management.fitnessfunction.circular
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import net.adam85w.ddd.boundedcontextcanvas.management.BoundedContextAwareness;
-import net.adam85w.ddd.boundedcontextcanvas.management.BoundedContextAwarenessService;
+import net.adam85w.ddd.boundedcontextcanvas.management.BoundedContextAware;
+import net.adam85w.ddd.boundedcontextcanvas.management.BoundedContextAwareService;
 import net.adam85w.ddd.boundedcontextcanvas.model.BoundedContext;
 import net.adam85w.ddd.boundedcontextcanvas.model.Communication;
 import net.adam85w.ddd.boundedcontextcanvas.model.communication.Collaborator;
@@ -20,11 +20,11 @@ import java.util.stream.Collectors;
 @Component
 class CircularDependencyDiscoverer {
 
-    private final BoundedContextAwarenessService service;
+    private final BoundedContextAwareService service;
 
     private final ObjectMapper mapper;
 
-    CircularDependencyDiscoverer(BoundedContextAwarenessService service, ObjectMapper mapper) {
+    CircularDependencyDiscoverer(BoundedContextAwareService service, ObjectMapper mapper) {
         this.service = service;
         this.mapper = mapper;
     }
@@ -50,10 +50,10 @@ class CircularDependencyDiscoverer {
 
     private Set<Relation> obtainRelations() throws JsonProcessingException {
         Set<Relation> relations = new HashSet<>();
-        Iterable<? extends BoundedContextAwareness> awarenesses = service.obtainAll();
-        for (BoundedContextAwareness awarenessA : awarenesses) {
+        Iterable<? extends BoundedContextAware> awarenesses = service.obtainAll();
+        for (BoundedContextAware awarenessA : awarenesses) {
             BoundedContext boundedContextA = mapper.readValue(awarenessA.retrieveContext(), BoundedContext.class);
-            for (BoundedContextAwareness awarenessB : awarenesses) {
+            for (BoundedContextAware awarenessB : awarenesses) {
                 if (awarenessA.retrieveContext().equals(awarenessB.retrieveContext())) {
                     continue;
                 }

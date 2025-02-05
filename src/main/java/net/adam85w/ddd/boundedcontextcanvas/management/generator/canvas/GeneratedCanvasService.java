@@ -2,7 +2,7 @@ package net.adam85w.ddd.boundedcontextcanvas.management.generator.canvas;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.ValidationException;
-import net.adam85w.ddd.boundedcontextcanvas.management.BoundedContextAwarenessService;
+import net.adam85w.ddd.boundedcontextcanvas.management.BoundedContextAwareService;
 import net.adam85w.ddd.boundedcontextcanvas.model.BoundedContext;
 import org.springframework.stereotype.Service;
 
@@ -18,11 +18,11 @@ class GeneratedCanvasService {
 
     private final GeneratedCanvasCache cache;
 
-    private final BoundedContextAwarenessService canvasService;
+    private final BoundedContextAwareService canvasService;
 
     private final ObjectMapper mapper;
 
-    GeneratedCanvasService(GeneratedCanvasConnector connector, GeneratedCanvasCache cache, BoundedContextAwarenessService canvasService, ObjectMapper mapper) {
+    GeneratedCanvasService(GeneratedCanvasConnector connector, GeneratedCanvasCache cache, BoundedContextAwareService canvasService, ObjectMapper mapper) {
         this.connector = connector;
         this.cache = cache;
         this.canvasService = canvasService;

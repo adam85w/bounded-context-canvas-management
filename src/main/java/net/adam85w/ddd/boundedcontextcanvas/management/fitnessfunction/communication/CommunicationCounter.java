@@ -2,8 +2,8 @@ package net.adam85w.ddd.boundedcontextcanvas.management.fitnessfunction.communic
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import net.adam85w.ddd.boundedcontextcanvas.management.BoundedContextAwareness;
-import net.adam85w.ddd.boundedcontextcanvas.management.BoundedContextAwarenessService;
+import net.adam85w.ddd.boundedcontextcanvas.management.BoundedContextAware;
+import net.adam85w.ddd.boundedcontextcanvas.management.BoundedContextAwareService;
 import net.adam85w.ddd.boundedcontextcanvas.model.BoundedContext;
 import net.adam85w.ddd.boundedcontextcanvas.model.communication.Collaborator;
 import net.adam85w.ddd.boundedcontextcanvas.model.communication.Message;
@@ -18,11 +18,11 @@ import java.util.Set;
 @Component
 class CommunicationCounter {
 
-    private final BoundedContextAwarenessService service;
+    private final BoundedContextAwareService service;
 
     private final ObjectMapper mapper;
 
-    CommunicationCounter(BoundedContextAwarenessService service, ObjectMapper mapper) {
+    CommunicationCounter(BoundedContextAwareService service, ObjectMapper mapper) {
         this.service = service;
         this.mapper = mapper;
     }
@@ -39,8 +39,8 @@ class CommunicationCounter {
 
     private Set<Communication> obtainCommunications() throws JsonProcessingException {
         Set<Communication> communications = new HashSet<>();
-        for (BoundedContextAwareness boundedContextAwareness : service.obtainAll()) {
-            BoundedContext boundedContext = mapper.readValue(boundedContextAwareness.retrieveContext(), BoundedContext.class);
+        for (BoundedContextAware boundedContextAware : service.obtainAll()) {
+            BoundedContext boundedContext = mapper.readValue(boundedContextAware.retrieveContext(), BoundedContext.class);
             for (net.adam85w.ddd.boundedcontextcanvas.model.Communication communication : boundedContext.getInboundCommunication()) {
                 for (Collaborator collaborator : communication.getCollaborators()) {
                     for (Message message : communication.getMessages()) {

@@ -2,8 +2,8 @@ package net.adam85w.ddd.boundedcontextcanvas.management.diagram;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import net.adam85w.ddd.boundedcontextcanvas.management.BoundedContextAwareness;
-import net.adam85w.ddd.boundedcontextcanvas.management.BoundedContextAwarenessService;
+import net.adam85w.ddd.boundedcontextcanvas.management.BoundedContextAware;
+import net.adam85w.ddd.boundedcontextcanvas.management.BoundedContextAwareService;
 import net.adam85w.ddd.boundedcontextcanvas.model.BoundedContext;
 import net.adam85w.ddd.boundedcontextcanvas.model.Communication;
 import net.adam85w.ddd.boundedcontextcanvas.model.communication.Collaborator;
@@ -16,11 +16,11 @@ import java.util.Set;
 @org.springframework.stereotype.Component
 class DiagramGenerator {
 
-    private final BoundedContextAwarenessService service;
+    private final BoundedContextAwareService service;
 
     private final ObjectMapper mapper;
 
-    DiagramGenerator(BoundedContextAwarenessService service, ObjectMapper mapper) {
+    DiagramGenerator(BoundedContextAwareService service, ObjectMapper mapper) {
         this.service = service;
         this.mapper = mapper;
     }
@@ -28,8 +28,8 @@ class DiagramGenerator {
     public String generate() throws JsonProcessingException {
         Set<Relationship> relationships = new HashSet<>();
         Set<Component> components = new HashSet<>();
-        for (BoundedContextAwareness boundedContextAwareness : service.obtainAll()) {
-            BoundedContext boundedContext = mapper.readValue(boundedContextAwareness.retrieveContext(), BoundedContext.class);
+        for (BoundedContextAware boundedContextAware : service.obtainAll()) {
+            BoundedContext boundedContext = mapper.readValue(boundedContextAware.retrieveContext(), BoundedContext.class);
             components.add(new Component(boundedContext.getName(), ComponentType.valueOf(CollaboratorType.BOUNDED_CONTEXT)));
             for (Communication communication : boundedContext.getInboundCommunication()) {
                 for (Collaborator collaborator : communication.getCollaborators()) {

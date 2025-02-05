@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
-class CanvasService implements BoundedContextAwarenessService {
+class CanvasService implements BoundedContextAwareService {
 
     private final ObjectMapper mapper;
 
@@ -34,16 +34,16 @@ class CanvasService implements BoundedContextAwarenessService {
     }
 
     @Override
-    public BoundedContextAwareness obtain(long id) {
+    public BoundedContextAware obtain(long id) {
         return repository.findById(id).orElseThrow(() -> new CanvasNotFoundException("The canvas doesn't exist or was removed."));
     }
 
     @Override
-    public Iterable<? extends BoundedContextAwareness> obtainAll() {
+    public Iterable<? extends BoundedContextAware> obtainAll() {
         return repository.findAll();
     }
 
-    Iterable<? extends BoundedContextAwareness> obtain(String searchPhrase) {
+    Iterable<? extends BoundedContextAware> obtain(String searchPhrase) {
         return repository.findAllByNameContaining(searchPhrase);
     }
 

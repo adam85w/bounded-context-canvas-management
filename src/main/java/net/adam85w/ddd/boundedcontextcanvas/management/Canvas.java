@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
-class Canvas implements BoundedContextAwareness {
+class Canvas implements BoundedContextAware {
 
     @Id
     @SequenceGenerator(name = "canvas_seq_generator", sequenceName = "canvas_seq", allocationSize = 10)
