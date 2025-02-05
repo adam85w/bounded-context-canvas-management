@@ -7,7 +7,6 @@ import jakarta.persistence.OptimisticLockException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.ValidationException;
-import net.adam85w.ddd.boundedcontextcanvas.management.generator.template.TemplateService;
 import net.adam85w.ddd.boundedcontextcanvas.model.BoundedContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,13 +35,13 @@ class CanvasController {
 
     private final CanvasService service;
 
-    private final TemplateService templateService;
+    private final TemplateObtainer templateObtainer;
 
     private final ObjectMapper mapper;
 
-    CanvasController(CanvasService service, TemplateService templateService, ObjectMapper mapper, BoundedContext boundedContextExample) {
+    CanvasController(CanvasService service, TemplateObtainer templateObtainer, ObjectMapper mapper, BoundedContext boundedContextExample) {
         this.service = service;
-        this.templateService = templateService;
+        this.templateObtainer = templateObtainer;
         this.mapper = mapper;
         this.boundedContextExample = boundedContextExample;
     }
@@ -60,7 +59,7 @@ class CanvasController {
             modelAndView.addObject("canvases", service.obtainAll());
             modelAndView.addObject("searchPhrase", null);
         }
-        modelAndView.addObject("templates", templateService.obtain());
+        modelAndView.addObject("templates", templateObtainer.obtain());
         modelAndView.setViewName("canvas/list");
         return modelAndView;
     }
@@ -74,7 +73,7 @@ class CanvasController {
         } else {
             modelAndView.addObject("boundedContext", BOUNDED_CONTEXT_EMPTY);
         }
-        modelAndView.addObject("templates", templateService.obtain());
+        modelAndView.addObject("templates", templateObtainer.obtain());
         modelAndView.setViewName("canvas/form");
         return modelAndView;
     }
@@ -86,7 +85,7 @@ class CanvasController {
         modelAndView.addObject("version", canvas.getVersion());
         modelAndView.addObject("name", canvas.getName());
         modelAndView.addObject("boundedContext", mapper.readValue(canvas.retrieveContext(), BoundedContext.class));
-        modelAndView.addObject("templates", templateService.obtain());
+        modelAndView.addObject("templates", templateObtainer.obtain());
         modelAndView.setViewName("canvas/form");
         return modelAndView;
     }
@@ -97,7 +96,7 @@ class CanvasController {
         modelAndView.addObject("id", 0);
         modelAndView.addObject("name", canvas.getName());
         modelAndView.addObject("boundedContext", mapper.readValue(canvas.retrieveContext(), BoundedContext.class));
-        modelAndView.addObject("templates", templateService.obtain());
+        modelAndView.addObject("templates", templateObtainer.obtain());
         modelAndView.setViewName("canvas/form");
         return modelAndView;
     }

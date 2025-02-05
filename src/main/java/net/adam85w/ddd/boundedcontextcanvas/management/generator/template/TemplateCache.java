@@ -10,22 +10,21 @@ import java.util.*;
 @Component
 class TemplateCache {
 
-    private final ISet<Map<String, List<String>>> templates;
+    private final ISet<Map<String, Set<String>>> templates;
 
     TemplateCache(HazelcastInstance hazelcastInstance) {
         templates = hazelcastInstance.getSet("templates");
     }
 
-    void add(Map<String, List<String>> templates) {
+    void add(Map<String, Set<String>> templates) {
         this.templates.add(templates);
     }
 
-    Optional<Map<String, List<String>>> get() {
+    Optional<Map<String, Set<String>>> get() {
         return templates.stream().findFirst();
     }
 
-    @Scheduled(fixedRateString = "${application.integration.generator.template.cache.evict-time:360000}",
-            initialDelayString = "${application.integration.generator.template.cache.evict-time:360000}")
+    @Scheduled(fixedRateString = "${application.integration.generator.template.cache.evict-time:360000}", initialDelayString = "${application.integration.generator.template.cache.evict-time:360000}")
     void evict() {
         templates.clear();
     }

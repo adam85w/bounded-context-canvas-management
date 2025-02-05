@@ -1,11 +1,12 @@
 package net.adam85w.ddd.boundedcontextcanvas.management.generator.template;
 
+import net.adam85w.ddd.boundedcontextcanvas.management.TemplateObtainer;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 @Service
-public class TemplateService {
+class TemplateService implements TemplateObtainer {
 
     private final TemplateConnector connector;
 
@@ -16,28 +17,29 @@ public class TemplateService {
         this.cache = cache;
     }
 
-    public Map<String, List<String>> obtain() {
-        return cache.get().orElseGet(() -> {
+    public Map<String, Set<String>> obtain() {
+        if (cache.get().isEmpty()) {
             synchronized (cache) {
-                var contextInfo = connector.perform();
-                var templates = new TreeMap<String, List<String>>();
-                contextInfo.templates().forEach(template -> addTemplate(templates, template));
-                cache.add(templates);
-                return templates;
+                if (cache.get().isEmpty()) {
+                    var contextInfo = connector.perform();
+                    var templates = new TreeMap<String, Set<String>>();
+                    contextInfo.templates().forEach(template -> addTemplate(templates, template));
+                    cache.add(templates);
+                }
             }
-        });
+        }
+        return cache.get().get();
     }
 
-    private void addTemplate(Map<String, List<String>> templates, Template template) {
+    private void addTemplate(Map<String, Set<String>> templates, Template template) {
         for (String type: template.support()) {
             if (templates.containsKey(type)) {
                 templates.get(type).add(template.name());
             } else {
-                var list = new ArrayList<String>();
-                list.add(template.name());
-                templates.put(type, list);
+                var names = new TreeSet<String>();
+                names.add(template.name());
+                templates.put(type, names);
             }
         }
-        templates.values().forEach(list -> list.sort(String.CASE_INSENSITIVE_ORDER));
     }
 }
