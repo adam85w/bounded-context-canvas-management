@@ -1,7 +1,7 @@
 version: '3'
 services:
   bounded-context-canvas-management:
-    image: localhost/adam85w/bounded-context-canvas-management:1.0.0-beta-1
+    image: docker.io/adam85w/bounded-context-canvas-management:1.0.0-beta-2
     restart: unless-stopped
     ports:
       - "8084:8084"
@@ -10,6 +10,13 @@ services:
         condition: service_completed_successfully
       bounded-context-canvas:
         condition: service_completed_successfully
+      kroki:
+        condition: service_completed_successfully
+  kroki:
+    image: docker.io/yuzutech/kroki:0.26.0
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
   bounded-context-canvas:
     image: docker.io/adam85w/bounded-context-canvas:3.2.1
     restart: unless-stopped

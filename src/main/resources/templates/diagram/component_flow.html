@@ -44,7 +44,7 @@
             <pre class="text-start p-3 mb-2 bg-dark text-white">[[${source}]]</pre>
             <h2>Diagram</h2>
             <p class="text-start" >
-            <a th:href="${@environment.getProperty('application.diagram.url') + encoded}" target="_blank">Diagram link to the plantuml website</a>
+            <a th:href="${@environment.getProperty('application.diagram.url') + encoded}" target="_blank"><img th:src="${@environment.getProperty('application.diagram.url') + encoded}" alt="diagram" width="640" /></a>
             </p>
         </div>
     </div>
