@@ -17,6 +17,7 @@ class TemplateService implements TemplateObtainer {
         this.cache = cache;
     }
 
+    @Override
     public Map<String, Set<String>> obtain() {
         if (cache.get().isEmpty()) {
             synchronized (cache) {

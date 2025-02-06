@@ -29,11 +29,11 @@ class GeneratedCanvasService {
         this.mapper = mapper;
     }
 
-    public String generate(String templateType, String templateName, long id) throws Exception {
+    String generate(String templateType, String templateName, long id) throws Exception {
         return generate(templateType, templateName, mapper.readValue(canvasService.obtain(id).retrieveContext(), BoundedContext.class));
     }
 
-    public String generate(String templateType, String templateName, BoundedContext boundedContext) throws Exception {
+    String generate(String templateType, String templateName, BoundedContext boundedContext) throws Exception {
         var key = generateKey(templateType, templateName, mapper.writeValueAsString(boundedContext));
         synchronized (cache) {
             if (cache.get(key).isEmpty()) {
@@ -43,7 +43,7 @@ class GeneratedCanvasService {
         return key;
     }
 
-    public GeneratedCanvas obtainGeneratedCanvas(String key) {
+    GeneratedCanvas obtainGeneratedCanvas(String key) {
         return cache.get(key).orElseThrow(() -> new ValidationException("The canvas could not be found for the specified key."));
     }
 

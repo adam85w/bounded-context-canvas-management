@@ -9,7 +9,7 @@ import net.adam85w.ddd.boundedcontextcanvas.model.Communication;
 import org.springframework.stereotype.Component;
 
 @Component
-public class  CouplingCounter {
+class CouplingCounter {
 
     private final BoundedContextAwareService service;
 

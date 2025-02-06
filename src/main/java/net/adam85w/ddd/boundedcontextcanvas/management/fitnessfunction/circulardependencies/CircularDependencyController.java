@@ -9,7 +9,7 @@ import java.io.IOException;
 
 @Controller
 @RequestMapping("/fitness-functions/circular-dependencies")
-public class CircularDependencyController {
+class CircularDependencyController {
 
     private final CircularDependencyDiscoverer discoverer;
 

@@ -25,7 +25,7 @@ class DiagramGenerator {
         this.mapper = mapper;
     }
 
-    public String generate() throws JsonProcessingException {
+    String generate() throws JsonProcessingException {
         Set<Relationship> relationships = new HashSet<>();
         Set<Component> components = new HashSet<>();
         for (BoundedContextAware boundedContextAware : service.obtainAll()) {
