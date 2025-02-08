@@ -1,4 +1,4 @@
-package net.adam85w.ddd.boundedcontextcanvas.management.diagram;
+package net.adam85w.ddd.boundedcontextcanvas.management.diagram.dependency;
 
 import net.adam85w.ddd.boundedcontextcanvas.model.communication.CollaboratorType;
 

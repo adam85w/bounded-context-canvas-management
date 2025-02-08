@@ -1,15 +1,18 @@
 package net.adam85w.ddd.boundedcontextcanvas.management.diagram;
 
+import org.springframework.stereotype.Component;
+
 import java.util.Base64;
 import java.util.zip.Deflater;
 
-final class DiagramEncoder {
+@Component
+public final class DiagramEncoder {
 
-    static String encode(String decoded) {
+    public String encode(String decoded) {
         return new String(Base64.getUrlEncoder().encode(compress(decoded.getBytes())));
     }
 
-    private static byte[] compress(byte[] source) {
+    private byte[] compress(byte[] source) {
         Deflater deflater = new Deflater(Deflater.BEST_COMPRESSION);
         deflater.setInput(source);
         deflater.finish();

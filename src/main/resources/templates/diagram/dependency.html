@@ -45,32 +45,13 @@
     </nav>
     <div class="jumbotron d-flex min-vh-60">
         <div class="container mx-auto text-center border border-secondary m-4">
-            <h1>History of measurements</h1>
-            <p th:if="${measurements.isEmpty()}">No measurements have been recorded so far.</p>
-            <table class="table table-striped" th:if="${!measurements.isEmpty()}">
-                <thead>
-                <tr>
-                    <th>Canvas name</th>
-                    <th>Operation type</th>
-                    <th>Queries (percentages)</th>
-                    <th>Commands (percentages)</th>
-                    <th>Events (percentages)</th>
-                    <th>Date</th>
-                </tr>
-                </thead>
-                <tbody>
-                <th:block th:each="measurement, stat: ${measurements}">
-                    <tr>
-                        <td>[[${measurement.getCanvasName()}]]</td>
-                        <td>[[${#strings.toLowerCase(measurement.getOperationType())}]]</td>
-                        <td>[[${measurement.getQueriesAmount()}]] ([[${#numbers.formatDecimal(((100F*measurement.getQueriesAmount())/(measurement.getQueriesAmount()+measurement.getCommandsAmount()+measurement.getEventsAmount())), 2, 2)}]])</td>
-                        <td>[[${measurement.getCommandsAmount()}]] ([[${#numbers.formatDecimal(((100F*measurement.getCommandsAmount())/(measurement.getQueriesAmount()+measurement.getCommandsAmount()+measurement.getEventsAmount())), 2, 2)}]])</td>
-                        <td>[[${measurement.getEventsAmount()}]] ([[${#numbers.formatDecimal(((100F*measurement.getEventsAmount())/(measurement.getQueriesAmount()+measurement.getCommandsAmount()+measurement.getEventsAmount())), 2, 2)}]])</td>
-                        <td>[[${#temporals.format(measurement.getCreatedAt(), 'dd-MM-yyyy HH:mm')}]]</td>
-                    </tr>
-                </th:block>
-                </tbody>
-            </table>
+            <h1>Dependency diagram</h1>
+            <h2>Image</h2>
+            <p class="text-start">
+                <a th:href="${@environment.getProperty('application.diagram.url') + encoded}" target="_blank"><img th:src="${@environment.getProperty('application.diagram.url') + encoded}" alt="diagram" width="640" /></a>
+            </p>
+            <h2>Source</h2>
+            <pre class="text-start p-3 mb-2 bg-dark text-white">[[${source}]]</pre>
         </div>
     </div>
     <div id="push"></div>

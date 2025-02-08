@@ -1,4 +1,4 @@
-package net.adam85w.ddd.boundedcontextcanvas.management.diagram;
+package net.adam85w.ddd.boundedcontextcanvas.management.diagram.communication;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,13 +14,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 @org.springframework.stereotype.Component
-class DiagramGenerator {
+class CommunicationDiagramGenerator {
 
     private final BoundedContextAwareService service;
 
     private final ObjectMapper mapper;
 
-    DiagramGenerator(BoundedContextAwareService service, ObjectMapper mapper) {
+    CommunicationDiagramGenerator(BoundedContextAwareService service, ObjectMapper mapper) {
         this.service = service;
         this.mapper = mapper;
     }

@@ -30,8 +30,14 @@
                             <li><a class="dropdown-item" href="/fitness-functions/couplings">Couplings</a></li>
                         </ul>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/diagram/component-flow">Generate diagram</a>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Diagrams
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/diagram/communication">Communication</a></li>
+                            <li><a class="dropdown-item" href="/diagram/dependency">Dependency</a></li>
+                        </ul>
                     </li>
                 </ul>
             </div>
@@ -39,13 +45,13 @@
     </nav>
     <div class="jumbotron d-flex min-vh-60">
         <div class="container mx-auto text-center border border-secondary m-4">
-            <h1>Diagram component flow</h1>
+            <h1>Communication diagram</h1>
+            <h2>Image</h2>
+            <p class="text-start">
+                <a th:href="${@environment.getProperty('application.diagram.url') + encoded}" target="_blank"><img th:src="${@environment.getProperty('application.diagram.url') + encoded}" alt="diagram" width="640" /></a>
+            </p>
             <h2>Source</h2>
             <pre class="text-start p-3 mb-2 bg-dark text-white">[[${source}]]</pre>
-            <h2>Diagram</h2>
-            <p class="text-start" >
-            <a th:href="${@environment.getProperty('application.diagram.url') + encoded}" target="_blank"><img th:src="${@environment.getProperty('application.diagram.url') + encoded}" alt="diagram" width="640" /></a>
-            </p>
         </div>
     </div>
     <div id="push"></div>
