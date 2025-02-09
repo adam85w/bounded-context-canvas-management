@@ -56,10 +56,12 @@ class Canvas implements BoundedContextAware {
         this.name = name;
         this.context = context;
         this.createdAt = createdAt;
+        this.updatedAt = createdAt;
     }
 
-    public void update(String context) {
+    public void update(String context, LocalDateTime updatedAt) {
         this.context = context;
+        this.updatedAt = updatedAt;
         version++;
     }
 

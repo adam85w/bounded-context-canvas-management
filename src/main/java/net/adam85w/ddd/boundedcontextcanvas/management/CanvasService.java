@@ -40,11 +40,11 @@ class CanvasService implements BoundedContextAwareService {
 
     @Override
     public Iterable<? extends BoundedContextAware> obtainAll() {
-        return repository.findAll();
+        return repository.findAllByOrderByUpdatedAtDesc();
     }
 
     Iterable<? extends BoundedContextAware> obtain(String searchPhrase) {
-        return repository.findAllByNameContaining(searchPhrase);
+        return repository.findAllByNameContainingOrderByUpdatedAtDesc(searchPhrase);
     }
 
     Canvas save(long id, int version, BoundedContext boundedContext) throws JsonProcessingException {
@@ -66,7 +66,7 @@ class CanvasService implements BoundedContextAwareService {
             if (entity.getVersion() != version) {
                 throw new CanvasOperationConflictException("The canvas was modified by a different user! Please refresh and check for changes.");
             }
-            entity.update(mapper.writeValueAsString(boundedContext));
+            entity.update(mapper.writeValueAsString(boundedContext), LocalDateTime.now());
             repository.save(entity);
             canvasOperationRepository.save(new CanvasOperation(entity.getName(), OperationType.EDIT, LocalDateTime.now()));
         }

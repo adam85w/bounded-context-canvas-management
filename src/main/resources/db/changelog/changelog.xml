@@ -18,7 +18,9 @@
             <column name="created_at" type="DATETIME(6)">
                 <constraints nullable="false" />
             </column>
-            <column name="updated_at" type="DATETIME(6)" />
+            <column name="updated_at" type="DATETIME(6)">
+                <constraints nullable="false" />
+            </column>
         </createTable>
         <createSequence sequenceName="canvas_seq" incrementBy="10" cacheSize="100" />
         <createTable tableName="canvas_operation">
