@@ -14,9 +14,9 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -47,58 +47,57 @@ class CanvasController {
     }
 
     @GetMapping({"/list", "/"})
-    ModelAndView list(@RequestParam(name="searchPhrase", required = false) String searchPhrase, @RequestParam(name="action", defaultValue = "EMPTY") Action action, @RequestParam(name="name", required = false) String canvasName, ModelAndView modelAndView) {
+    String list(@RequestParam(name="searchPhrase", required = false) String searchPhrase,
+                @RequestParam(name="action", defaultValue = "EMPTY") Action action,
+                @RequestParam(name="name", required = false) String canvasName,
+                Model model) {
         if (Action.EMPTY != action) {
-            modelAndView.addObject("action", action);
-            modelAndView.addObject("canvasName", new String(Base64.getDecoder().decode(canvasName)));
+            model.addAttribute("action", action);
+            model.addAttribute("canvasName", new String(Base64.getDecoder().decode(canvasName)));
         }
         if (searchPhrase != null && !searchPhrase.isBlank()) {
-            modelAndView.addObject("canvases", service.obtain(searchPhrase));
-            modelAndView.addObject("searchPhrase", searchPhrase);
+            model.addAttribute("canvases", service.obtain(searchPhrase));
+            model.addAttribute("searchPhrase", searchPhrase);
         } else {
-            modelAndView.addObject("canvases", service.obtainAll());
-            modelAndView.addObject("searchPhrase", null);
+            model.addAttribute("canvases", service.obtainAll());
+            model.addAttribute("searchPhrase", null);
         }
-        modelAndView.addObject("templates", templateObtainer.obtain());
-        modelAndView.setViewName("canvas/list");
-        return modelAndView;
+        model.addAttribute("templates", templateObtainer.obtain());
+        return "canvas/list";
     }
 
     @GetMapping("/add")
-    ModelAndView add(@RequestParam(name="example", defaultValue = "false") boolean example, ModelAndView modelAndView) {
-        modelAndView.addObject("id", 0);
-        modelAndView.addObject("title", "Adding a new Bounded Context Canvas");
+    String add(@RequestParam(name="example", defaultValue = "false") boolean example, Model model) {
+        model.addAttribute("id", 0);
+        model.addAttribute("title", "Adding a new Bounded Context Canvas");
         if (example) {
-            modelAndView.addObject("boundedContext", boundedContextExample);
+            model.addAttribute("boundedContext", boundedContextExample);
         } else {
-            modelAndView.addObject("boundedContext", BOUNDED_CONTEXT_EMPTY);
+            model.addAttribute("boundedContext", BOUNDED_CONTEXT_EMPTY);
         }
-        modelAndView.addObject("templates", templateObtainer.obtain());
-        modelAndView.setViewName("canvas/form");
-        return modelAndView;
+        model.addAttribute("templates", templateObtainer.obtain());
+        return "canvas/form";
     }
 
     @GetMapping("/edit")
-    ModelAndView edit(ModelAndView modelAndView, @RequestParam(name = "id") long id) throws JsonProcessingException {
+    String edit(Model model, @RequestParam(name = "id") long id) throws JsonProcessingException {
         Canvas canvas = (Canvas) service.obtain(id);
-        modelAndView.addObject("id", canvas.getId());
-        modelAndView.addObject("version", canvas.getVersion());
-        modelAndView.addObject("name", canvas.getName());
-        modelAndView.addObject("boundedContext", mapper.readValue(canvas.retrieveContext(), BoundedContext.class));
-        modelAndView.addObject("templates", templateObtainer.obtain());
-        modelAndView.setViewName("canvas/form");
-        return modelAndView;
+        model.addAttribute("id", canvas.getId());
+        model.addAttribute("version", canvas.getVersion());
+        model.addAttribute("name", canvas.getName());
+        model.addAttribute("boundedContext", mapper.readValue(canvas.retrieveContext(), BoundedContext.class));
+        model.addAttribute("templates", templateObtainer.obtain());
+        return "canvas/form";
     }
 
     @GetMapping("/clone")
-    ModelAndView clone(ModelAndView modelAndView, @RequestParam(name = "id") long id) throws JsonProcessingException {
+    String clone(Model model, @RequestParam(name = "id") long id) throws JsonProcessingException {
         Canvas canvas = (Canvas) service.obtain(id);
-        modelAndView.addObject("id", 0);
-        modelAndView.addObject("name", canvas.getName());
-        modelAndView.addObject("boundedContext", mapper.readValue(canvas.retrieveContext(), BoundedContext.class));
-        modelAndView.addObject("templates", templateObtainer.obtain());
-        modelAndView.setViewName("canvas/form");
-        return modelAndView;
+        model.addAttribute("id", 0);
+        model.addAttribute("name", canvas.getName());
+        model.addAttribute("boundedContext", mapper.readValue(canvas.retrieveContext(), BoundedContext.class));
+        model.addAttribute("templates", templateObtainer.obtain());
+        return "canvas/form";
     }
 
     @PostMapping(value = "/save", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)

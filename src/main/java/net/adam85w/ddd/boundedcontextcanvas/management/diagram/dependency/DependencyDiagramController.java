@@ -2,9 +2,9 @@ package net.adam85w.ddd.boundedcontextcanvas.management.diagram.dependency;
 
 import net.adam85w.ddd.boundedcontextcanvas.management.diagram.DiagramEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.ModelAndView;
 
 import java.io.IOException;
 
@@ -22,11 +22,10 @@ class DependencyDiagramController {
     }
 
     @GetMapping
-    ModelAndView generate(ModelAndView modelAndView) throws IOException {
+    String generate(Model model) throws IOException {
         var diagramSource = generator.generate();
-        modelAndView.addObject("source", diagramSource);
-        modelAndView.addObject("encoded", diagramEncoder.encode(diagramSource));
-        modelAndView.setViewName("diagram/dependency");
-        return modelAndView;
+        model.addAttribute("source", diagramSource);
+        model.addAttribute("encoded", diagramEncoder.encode(diagramSource));
+        return "diagram/dependency";
     }
 }

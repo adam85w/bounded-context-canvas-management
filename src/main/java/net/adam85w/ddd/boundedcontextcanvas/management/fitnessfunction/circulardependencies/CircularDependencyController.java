@@ -1,9 +1,9 @@
 package net.adam85w.ddd.boundedcontextcanvas.management.fitnessfunction.circulardependencies;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.ModelAndView;
 
 import java.io.IOException;
 
@@ -21,10 +21,9 @@ class CircularDependencyController {
     }
 
     @GetMapping
-    ModelAndView discover(ModelAndView modelAndView) throws IOException {
-        modelAndView.addObject("circularDependencies", discoverer.discover());
-        modelAndView.addObject("measurements", measurementService.retrieve());
-        modelAndView.setViewName("fitness_functions/circular_dependencies");
-        return modelAndView;
+    String discover(Model model) throws IOException {
+        model.addAttribute("circularDependencies", discoverer.discover());
+        model.addAttribute("measurements", measurementService.retrieve());
+        return "fitness_functions/circular_dependencies";
     }
 }
