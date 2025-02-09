@@ -1,20 +1,20 @@
 version: '3'
 services:
   bounded-context-canvas-management:
-    image: docker.io/adam85w/bounded-context-canvas-management:1.0.0-beta-2
-    restart: unless-stopped
+    image: docker.io/adam85w/bounded-context-canvas-management:1.0.0-beta-3
+    restart: always
     ports:
       - "8084:8084"
     depends_on:
       mariadb:
-        condition: service_completed_successfully
+        condition: service_healthy
       bounded-context-canvas:
-        condition: service_completed_successfully
+        condition: service_started
       kroki:
-        condition: service_completed_successfully
+        condition: service_started
   kroki:
     image: docker.io/yuzutech/kroki:0.26.0
-    restart: unless-stopped
+    restart: always
     ports:
       - "8000:8000"
   bounded-context-canvas:
@@ -22,21 +22,9 @@ services:
     restart: unless-stopped
     ports:
       - "8083:8083"
-  phpmyadmin:
-    image: docker.io/phpmyadmin
-    restart: unless-stopped
-    environment:
-      PMA_HOST: mariadb
-      PMA_USER: canvas
-      PMA_PASSWORD: letmein1
-    ports:
-      - "8082:80"
-    depends_on:
-      mariadb:
-        condition: service_completed_successfully
   mariadb:
-    image: docker.io/mariadb:latest
-    restart: unless-stopped
+    image: docker.io/mariadb:11.6-noble
+    restart: always
     environment:
       MYSQL_ROOT_PASSWORD: letmein1
       MYSQL_DATABASE: canvases
@@ -46,3 +34,15 @@ services:
       - "3306:3306"
     volumes:
       - ./data:/var/lib/mysql
+  phpmyadmin:
+    image: docker.io/phpmyadmin:5.2.2-apache
+    restart: always
+    environment:
+      PMA_HOST: mariadb
+      PMA_USER: canvas
+      PMA_PASSWORD: letmein1
+    ports:
+      - "8082:80"
+    depends_on:
+      mariadb:
+        condition: service_healthy
