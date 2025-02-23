@@ -47,7 +47,7 @@
                     <div class="mb-3">
                         <label class="col-form-label">Template type:</label>
                         <select name="templateType" class="form-control">
-                            <option th:each="templateType: ${templates.keySet()}" th:value="${templateType}">[[${templateType}]]</option>
+                            <option th:each="templateType: ${templates.keySet()}" th:value="${templateType}">[[${#strings.toLowerCase(templateType)}]]</option>
                         </select>
                     </div>
                     <div class="mb-3">
