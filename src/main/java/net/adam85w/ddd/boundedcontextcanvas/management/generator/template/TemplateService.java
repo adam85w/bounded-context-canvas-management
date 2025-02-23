@@ -3,7 +3,10 @@ package net.adam85w.ddd.boundedcontextcanvas.management.generator.template;
 import net.adam85w.ddd.boundedcontextcanvas.management.TemplateObtainer;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 @Service
 class TemplateService implements TemplateObtainer {

@@ -1,8 +1,8 @@
 package net.adam85w.ddd.boundedcontextcanvas.management.fitnessfunction.circulardependencies;
 
 import jakarta.transaction.Transactional;
-import net.adam85w.ddd.boundedcontextcanvas.management.CanvasOperationNotifiable;
 import net.adam85w.ddd.boundedcontextcanvas.management.CanvasOperation;
+import net.adam85w.ddd.boundedcontextcanvas.management.CanvasOperationNotifiable;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;

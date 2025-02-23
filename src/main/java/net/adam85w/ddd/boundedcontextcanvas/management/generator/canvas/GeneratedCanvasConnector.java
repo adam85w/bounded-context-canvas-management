@@ -3,7 +3,6 @@ package net.adam85w.ddd.boundedcontextcanvas.management.generator.canvas;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.ValidationException;
 import net.adam85w.ddd.boundedcontextcanvas.management.generator.ClientHttpRequestFactory;
-
 import net.adam85w.ddd.boundedcontextcanvas.model.BoundedContext;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
