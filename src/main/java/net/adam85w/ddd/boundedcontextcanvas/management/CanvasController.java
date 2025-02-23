@@ -10,15 +10,14 @@ import jakarta.validation.ValidationException;
 import net.adam85w.ddd.boundedcontextcanvas.model.BoundedContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.io.*;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.LinkedList;
@@ -100,6 +99,29 @@ class CanvasController {
         return "canvas/form";
     }
 
+    @GetMapping("/export")
+    ResponseEntity<String> export(Model model, @RequestParam(name = "id") long id) {
+        Canvas canvas = (Canvas) service.obtain(id);
+        model.addAttribute("id", 0);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setContentDisposition(ContentDisposition.attachment()
+                .filename(canvas.getName().replace(" ", "_" ) + ".json")
+                .build());
+        return new ResponseEntity<>(canvas.retrieveContext(), headers, HttpStatus.OK);
+    }
+
+    @GetMapping("/load")
+    String load() {
+        return "canvas/load";
+    }
+
+    @PostMapping("/load")
+    void load(@RequestParam(name = "file") MultipartFile file, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        var canvas = service.load(mapper.readValue(file.getInputStream().readAllBytes(), BoundedContext.class));
+        response.sendRedirect(String.format("%s/list?action=%s&name=%s", request.getContextPath(), Action.LOAD, Base64.getEncoder().encodeToString(canvas.getName().getBytes(StandardCharsets.UTF_8))));
+    }
+
     @PostMapping(value = "/save", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<Map<String, String>> save(@RequestBody BoundedContext boundedContext, @RequestParam(name = "id", defaultValue = "0") long id, @RequestParam(name="version", defaultValue = "0") int version, HttpServletRequest request) throws IOException {
         Canvas canvas = service.save(id, version, boundedContext);
@@ -139,7 +161,7 @@ class CanvasController {
     }
 
     enum Action {
-        ADD("added"), EDIT("edited"), DELETE("deleted"), EMPTY(null);
+        ADD("added"), LOAD("loaded"), EDIT("edited"), DELETE("deleted"), EMPTY(null);
 
         final String name;
 

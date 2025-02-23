@@ -66,6 +66,9 @@
                     <li class="nav-item">
                         <a href="/add" class="nav-link">Add a new one</a>
                     </li>
+                    <li class="nav-item">
+                        <a href="/load" class="nav-link">Load</a>
+                    </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             Fitness functions
@@ -131,6 +134,7 @@
                             <a th:href="${'/edit?id=' + generatedCanvas.id}" title="edit"><i class="bi bi-journal-text"></i></a>
                             <a th:href="${'/clone?id=' + generatedCanvas.id}" title="clone"><i class="bi bi-view-stacked"></i></a>
                             <a data-bs-toggle="modal" th:data-id="${generatedCanvas.id}"  data-bs-target="#generate-canvas-form" href="#" title="generate" class="generate"><i class="bi bi-gear"></i></a>
+                            <a th:href="${'/export?id=' + generatedCanvas.id}" title="export" target="_blank"><i class="bi bi-filetype-json"></i></a>
                             <a th:href="${'/delete?id=' + generatedCanvas.id + '&amp;version=' + generatedCanvas.version}" title="delete"><i class="bi bi-journal-x"></i></a>
                         </td>
                     </tr>
