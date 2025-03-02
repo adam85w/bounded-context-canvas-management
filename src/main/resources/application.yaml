@@ -39,6 +39,6 @@ application:
     example:
       file-name: example.json
   diagram:
-    url: "http://localhost:8000/plantuml/png/"
+    url: http://localhost:8085/plantuml/png/
   operation-notification:
     scheduler: 1000
