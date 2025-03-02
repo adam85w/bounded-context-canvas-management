@@ -68,9 +68,24 @@
                         <td>[[${measurement.getCanvasName()}]]</td>
                         <td>[[${#strings.toLowerCase(measurement.getOperationType())}]]</td>
                         <td>[[${measurement.getComponentsAmount()}]]</td>
-                        <td>[[${measurement.getAfferentCouplingsAmount()}]] ([[${#numbers.formatDecimal(1F*measurement.getAfferentCouplingsAmount()/measurement.getComponentsAmount(), 0, 2)}]])</td>
-                        <td>[[${measurement.getEfferentCouplingsAmount()}]] ([[${#numbers.formatDecimal(1F*measurement.getEfferentCouplingsAmount()/measurement.getComponentsAmount(), 0, 2)}]])</td>
-                        <td>[[${#numbers.formatDecimal((1F*(measurement.getAfferentCouplingsAmount()+measurement.getEfferentCouplingsAmount()))/measurement.getComponentsAmount(), 0, 2)}]]</td>
+                        <td>[[${measurement.getAfferentCouplingsAmount()}]]
+                            <th:block th:if="${measurement.getComponentsAmount() != 0}">
+                                ([[${#numbers.formatDecimal(1F*measurement.getAfferentCouplingsAmount()/measurement.getComponentsAmount(), 0, 2)}]])
+                            </th:block>
+                        </td>
+                        <td>[[${measurement.getEfferentCouplingsAmount()}]]
+                            <th:block th:if="${measurement.getComponentsAmount() != 0}">
+                                ([[${#numbers.formatDecimal(1F*measurement.getEfferentCouplingsAmount()/measurement.getComponentsAmount(), 0, 2)}]])
+                            </th:block>
+                        </td>
+                        <td>
+                            <th:block th:if="${measurement.getComponentsAmount() != 0}">
+                                [[${#numbers.formatDecimal((1F*(measurement.getAfferentCouplingsAmount()+measurement.getEfferentCouplingsAmount()))/measurement.getComponentsAmount(), 0, 2)}]]
+                            </th:block>
+                            <th:block th:if="${measurement.getComponentsAmount() == 0}">
+                                0
+                            </th:block>
+                        </td>
                         <td>[[${#temporals.format(measurement.getCreatedAt(), 'dd-MM-yyyy HH:mm')}]]</td>
                     </tr>
                 </th:block>

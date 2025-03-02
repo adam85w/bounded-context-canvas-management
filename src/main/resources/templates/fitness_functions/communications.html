@@ -63,12 +63,24 @@
                 </thead>
                 <tbody>
                 <th:block th:each="measurement, stat: ${measurements}">
-                    <tr>
+                    <tr th:with="all=${measurement.getQueriesAmount()+measurement.getCommandsAmount()+measurement.getEventsAmount()}">
                         <td>[[${measurement.getCanvasName()}]]</td>
                         <td>[[${#strings.toLowerCase(measurement.getOperationType())}]]</td>
-                        <td>[[${measurement.getQueriesAmount()}]] ([[${#numbers.formatDecimal(((100F*measurement.getQueriesAmount())/(measurement.getQueriesAmount()+measurement.getCommandsAmount()+measurement.getEventsAmount())), 2, 2)}]])</td>
-                        <td>[[${measurement.getCommandsAmount()}]] ([[${#numbers.formatDecimal(((100F*measurement.getCommandsAmount())/(measurement.getQueriesAmount()+measurement.getCommandsAmount()+measurement.getEventsAmount())), 2, 2)}]])</td>
-                        <td>[[${measurement.getEventsAmount()}]] ([[${#numbers.formatDecimal(((100F*measurement.getEventsAmount())/(measurement.getQueriesAmount()+measurement.getCommandsAmount()+measurement.getEventsAmount())), 2, 2)}]])</td>
+                        <td>[[${measurement.getQueriesAmount()}]]
+                            <th:block th:if="${all != 0}">
+                                ([[${#numbers.formatDecimal((100F*measurement.getQueriesAmount()/all), 2, 2)}]])
+                            </th:block>
+                        </td>
+                        <td>[[${measurement.getCommandsAmount()}]]
+                            <th:block th:if="${all != 0}">
+                                ([[${#numbers.formatDecimal((100F*measurement.getCommandsAmount()/all), 2, 2)}]])
+                            </th:block>
+                        </td>
+                        <td>[[${measurement.getEventsAmount()}]]
+                            <th:block th:if="${all != 0}">
+                                ([[${#numbers.formatDecimal((100F*measurement.getEventsAmount()/all), 2, 2)}]])
+                            </th:block>
+                        </td>
                         <td>[[${#temporals.format(measurement.getCreatedAt(), 'dd-MM-yyyy HH:mm')}]]</td>
                     </tr>
                 </th:block>
