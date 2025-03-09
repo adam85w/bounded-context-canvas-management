@@ -77,6 +77,6 @@ class DependencyDiagramGenerator {
     }
 
     private String format(String text) {
-        return text.replaceAll(" ", "_");
+        return text.replaceAll(" ", "_").replaceAll("-", "_");
     }
 }
