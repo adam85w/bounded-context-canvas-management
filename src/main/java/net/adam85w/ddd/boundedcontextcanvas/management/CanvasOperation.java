@@ -65,4 +65,9 @@ public class CanvasOperation {
     public int hashCode() {
         return Objects.hash(canvasName, operationType, createdAt);
     }
+
+    @Override
+    public String toString() {
+        return operationType + " for " + canvasName + " at " + createdAt;
+    }
 }

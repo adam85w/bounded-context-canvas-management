@@ -41,4 +41,6 @@ application:
   diagram:
     url: http://localhost:8085/plantuml/png/
   operation-notification:
-    scheduler: 1000
+    scheduler: 3000
+    lock: PT2,5S
+

@@ -104,4 +104,20 @@
         </createTable>
         <createSequence sequenceName="coupling_measurement_seq" incrementBy="10" cacheSize="100" />
     </changeSet>
+    <changeSet id="2" author="adam85w">
+        <createTable tableName="shedlock">
+            <column name="name" type="VARCHAR(64)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="lock_until" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="locked_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="locked_by" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
 </databaseChangeLog>
