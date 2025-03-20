@@ -1,6 +1,7 @@
 package net.adam85w.ddd.boundedcontextcanvas.management;
 
 import jakarta.persistence.*;
+import jakarta.validation.ValidationException;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -60,6 +61,9 @@ class Canvas implements BoundedContextAware {
     }
 
     public void update(String context, LocalDateTime updatedAt) {
+        if (this.context.equals(context)) {
+            throw new ValidationException("No changes have been made in the canvas.");
+        }
         this.context = context;
         this.updatedAt = updatedAt;
         version++;
