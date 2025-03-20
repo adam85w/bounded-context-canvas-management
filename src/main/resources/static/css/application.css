@@ -44,3 +44,24 @@ html, body {
     text-align: right;
     line-height: 60px;
 }
+/* canvas list */
+#canvas-list th,
+#canvas-list td {
+    text-align: left;
+}
+#canvas-list .selector {
+    width: 25px;
+    max-width: 25px;
+    text-align: center;
+}
+#canvas-list .name {
+    width: auto;
+}
+#canvas-list .created-at,
+#canvas-list .updated-at {
+    width: 15%;
+}
+#canvas-list .options {
+    width: 15%;
+    text-align: center;
+}

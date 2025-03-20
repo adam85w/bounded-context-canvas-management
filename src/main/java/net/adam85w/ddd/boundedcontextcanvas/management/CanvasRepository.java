@@ -4,6 +4,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 interface CanvasRepository extends CrudRepository<Canvas, Long> {
@@ -15,4 +16,6 @@ interface CanvasRepository extends CrudRepository<Canvas, Long> {
     Iterable<? extends BoundedContextAware> findAllByOrderByUpdatedAtDesc();
 
     Optional<Canvas> findByName(String name);
+
+    Iterable<? extends BoundedContextAware> findByIdInOrderByUpdatedAtDesc(Set<Long> ids);
 }

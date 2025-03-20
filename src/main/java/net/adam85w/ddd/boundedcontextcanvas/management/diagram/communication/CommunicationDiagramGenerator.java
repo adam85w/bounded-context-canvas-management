@@ -25,10 +25,10 @@ class CommunicationDiagramGenerator {
         this.mapper = mapper;
     }
 
-    String generate() throws JsonProcessingException {
+    String generate(Set<Long> ids) throws JsonProcessingException {
         Set<Relationship> relationships = new HashSet<>();
         Set<Component> components = new HashSet<>();
-        for (BoundedContextAware boundedContextAware : service.obtainAll()) {
+        for (BoundedContextAware boundedContextAware : obtainBoundedContexts(ids)) {
             BoundedContext boundedContext = mapper.readValue(boundedContextAware.retrieveContext(), BoundedContext.class);
             components.add(new Component(boundedContext.getName(), ComponentType.valueOf(CollaboratorType.BOUNDED_CONTEXT)));
             for (Communication communication : boundedContext.getInboundCommunication()) {
@@ -79,6 +79,13 @@ class CommunicationDiagramGenerator {
         builder.append("\n\n");
         builder.append("@enduml");
         return builder.toString();
+    }
+
+    Iterable<? extends BoundedContextAware> obtainBoundedContexts(Set<Long> ids) {
+        if (ids != null && !ids.isEmpty()) {
+            return service.obtain(ids);
+        }
+        return BoundedContextAwareService.EMPTY_LIST;
     }
 
     private String format(String text) {

@@ -40,6 +40,11 @@ class CanvasService implements BoundedContextAwareService {
     }
 
     @Override
+    public Iterable<? extends BoundedContextAware> obtain(Set<Long> ids) {
+        return repository.findByIdInOrderByUpdatedAtDesc(ids);
+    }
+
+    @Override
     public Iterable<? extends BoundedContextAware> obtainAll() {
         return repository.findAllByOrderByUpdatedAtDesc();
     }

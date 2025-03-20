@@ -50,6 +50,26 @@
                 $("input[name='id']").val(id);
             });
 
+            $("#generate-diagram-communication").click(function(event) {
+                event.preventDefault();
+                window.open("/diagram/communication?"+ $('input[name="ids"]:checked').serialize());
+                return false;
+            });
+
+            $("#generate-diagram-dependency").click(function(event) {
+                event.preventDefault();
+                window.open("/diagram/dependency?"+ $('input[name="ids"]:checked').serialize());
+                return false;
+            });
+
+            $('input[name="all"]').click(function(event) {
+                if ($(event.target).is(":checked")) {
+                    $('input[name="ids"]').prop("checked", true);
+                } else {
+                    $('input[name="ids"]').prop("checked", false);
+                }
+            })
+
             window.setTimeout(function() {
                 $(".auto-closable-alert").alert('close');
             }, 7000);
@@ -79,15 +99,6 @@
                             <li><a class="dropdown-item" href="/fitness-functions/couplings">Couplings</a></li>
                         </ul>
                     </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Diagrams
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="/diagram/communication">Communication</a></li>
-                            <li><a class="dropdown-item" href="/diagram/dependency">Dependency</a></li>
-                        </ul>
-                    </li>
                 </ul>
             </div>
             <form action="/list" class="d-flex" role="search">
@@ -113,33 +124,58 @@
     </div>
     <div class="jumbotron d-flex min-vh-60" th:if="${canvases.size() != 0}">
         <div class="container mx-auto text-center border border-secondary m-4">
-            <table class="table table-striped">
+            <form id="list-form">
+            <table id="canvas-list" class="table table-striped">
                 <thead>
                     <tr>
-                        <th>Name</th>
-                        <th>Created at</th>
-                        <th>Updated at</th>
-                        <th>Options</th>
+                        <th class="selector" />
+                        <th class="name">Name</th>
+                        <th class="created-at">Created at</th>
+                        <th class="updated-at">Updated at</th>
+                        <th class="options">Options</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr th:each="generatedCanvas: ${canvases}">
-                        <td>[[${generatedCanvas.name}]]</td>
-                        <td>[[${#temporals.format(generatedCanvas.createdAt, 'dd-MM-yyyy HH:mm')}]]</td>
-                        <td>
-                            <th:block th:if="${generatedCanvas.updatedAt == null}">--</th:block>
-                            <th:block th:if="${generatedCanvas.updatedAt != null}">[[${#temporals.format(generatedCanvas.updatedAt, 'dd-MM-yyyy HH:mm')}]]</th:block>
+                    <tr th:each="canvas: ${canvases}">
+                        <td class="selector">
+                            <label><input class="form-check-input" type="checkbox" name="ids" th:value="${canvas.id}" /></label>
                         </td>
-                        <td>
-                            <a th:href="${'/edit?id=' + generatedCanvas.id}" title="edit"><i class="bi bi-journal-text"></i></a>
-                            <a th:href="${'/clone?id=' + generatedCanvas.id}" title="clone"><i class="bi bi-view-stacked"></i></a>
-                            <a data-bs-toggle="modal" th:data-id="${generatedCanvas.id}"  data-bs-target="#generate-canvas-form" href="#" title="generate" class="generate"><i class="bi bi-gear"></i></a>
-                            <a th:href="${'/export?id=' + generatedCanvas.id}" title="export" target="_blank"><i class="bi bi-filetype-json"></i></a>
-                            <a th:href="${'/delete?id=' + generatedCanvas.id + '&amp;version=' + generatedCanvas.version}" title="delete"><i class="bi bi-journal-x"></i></a>
+                        <td class="name">[[${canvas.name}]]</td>
+                        <td class="created-at">[[${#temporals.format(canvas.createdAt, 'dd-MM-yyyy HH:mm')}]]</td>
+                        <td class="updated-at">
+                            <th:block th:if="${canvas.updatedAt == null}">--</th:block>
+                            <th:block th:if="${canvas.updatedAt != null}">[[${#temporals.format(canvas.updatedAt, 'dd-MM-yyyy HH:mm')}]]</th:block>
+                        </td>
+                        <td class="options">
+                            <a th:href="${'/edit?id=' + canvas.id}" title="edit"><i class="bi bi-journal-text"></i></a>
+                            <a th:href="${'/clone?id=' + canvas.id}" title="clone"><i class="bi bi-view-stacked"></i></a>
+                            <a data-bs-toggle="modal" th:data-id="${canvas.id}" data-bs-target="#generate-canvas-form" href="#" title="generate" class="generate"><i class="bi bi-gear"></i></a>
+                            <a th:href="${'/export?id=' + canvas.id}" title="export" target="_blank"><i class="bi bi-filetype-json"></i></a>
+                            <a th:href="${'/delete?id=' + canvas.id + '&amp;version=' + canvas.version}" title="delete"><i class="bi bi-journal-x"></i></a>
                         </td>
                     </tr>
                 </tbody>
+                <tfoot>
+                    <tr>
+                        <td class="selector">
+                            <input class="form-check-input" type="checkbox" name="all" title="all"/>
+                        </td>
+                        <td class="name" colspan="4">
+                            <div class="btn-group" role="group">
+                                <button id="btn-group-options-list" type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Generate diagrams
+                                    &nbsp;&nbsp;
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="btn-group-options-list">
+                                    <a id="generate-diagram-communication" class="dropdown-item" href="#">communication</a>
+                                    <a id="generate-diagram-dependency"  class="dropdown-item" href="#">dependency</a>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                </tfoot>
             </table>
+            </form>
         </div>
     </div>
     <div id="push"></div>
