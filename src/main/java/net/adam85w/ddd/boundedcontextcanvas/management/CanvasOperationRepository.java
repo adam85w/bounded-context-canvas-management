@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 interface CanvasOperationRepository extends CrudRepository<CanvasOperation, Long> {
 
-    Iterable<CanvasOperation> findAllByProcessedIsFalse();
+    CanvasOperation[] findAllByProcessedIsFalseOrderByCreatedAtAsc();
 }
