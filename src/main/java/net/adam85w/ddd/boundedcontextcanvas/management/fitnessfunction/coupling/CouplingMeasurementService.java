@@ -3,6 +3,10 @@ package net.adam85w.ddd.boundedcontextcanvas.management.fitnessfunction.coupling
 import jakarta.transaction.Transactional;
 import net.adam85w.ddd.boundedcontextcanvas.management.CanvasOperation;
 import net.adam85w.ddd.boundedcontextcanvas.management.CanvasOperationNotifiable;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -16,13 +20,17 @@ class CouplingMeasurementService implements CanvasOperationNotifiable {
 
     private final CouplingMeasurementRepository repository;
 
-    CouplingMeasurementService(CouplingCounter counter, CouplingMeasurementRepository repository) {
+    private final int pageSize;
+
+    CouplingMeasurementService(CouplingCounter counter, CouplingMeasurementRepository repository,
+                               @Value("${application.fitness-function.measurement.pagination.page-size}") int pageSize) {
         this.counter = counter;
         this.repository = repository;
+        this.pageSize = pageSize;
     }
 
-    Iterable<CouplingMeasurement> retrieve() {
-        return repository.findAllByOrderByCreatedAtDesc();
+    Page<CouplingMeasurement> retrieve(int pageNo) {
+        return repository.findAll(PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.DESC, "createdAt")));
     }
 
     @Override

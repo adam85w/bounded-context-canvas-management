@@ -40,6 +40,9 @@ application:
       file-name: example.json
   diagram:
     url: http://localhost:8085/plantuml/png/
+  fitness-function:
+    measurement:
+      pagination:
+        page-size: 20
   operation-notification:
     scheduler: 5000
-

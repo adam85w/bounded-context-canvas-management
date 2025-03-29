@@ -4,6 +4,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.IOException;
 
@@ -21,9 +22,9 @@ class CircularDependencyController {
     }
 
     @GetMapping
-    String discover(Model model) throws IOException {
+    String discover(Model model, @RequestParam(name = "pageNo", defaultValue = "0") int pageNo) throws IOException {
         model.addAttribute("circularDependencies", discoverer.discover());
-        model.addAttribute("measurements", measurementService.retrieve());
+        model.addAttribute("page", measurementService.retrieve(pageNo));
         return "fitness_functions/circular_dependencies";
     }
 }

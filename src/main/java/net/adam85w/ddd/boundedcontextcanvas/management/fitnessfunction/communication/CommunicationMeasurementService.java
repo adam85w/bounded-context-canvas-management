@@ -4,6 +4,10 @@ import jakarta.transaction.Transactional;
 import net.adam85w.ddd.boundedcontextcanvas.management.CanvasOperation;
 import net.adam85w.ddd.boundedcontextcanvas.management.CanvasOperationNotifiable;
 import net.adam85w.ddd.boundedcontextcanvas.model.communication.MessageType;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -17,13 +21,17 @@ class CommunicationMeasurementService implements CanvasOperationNotifiable {
 
     private final CommunicationMeasurementRepository repository;
 
-    CommunicationMeasurementService(CommunicationCounter counter, CommunicationMeasurementRepository repository) {
+    private final int pageSize;
+
+    CommunicationMeasurementService(CommunicationCounter counter, CommunicationMeasurementRepository repository,
+                                    @Value("${application.fitness-function.measurement.pagination.page-size}") int pageSize) {
         this.counter = counter;
         this.repository = repository;
+        this.pageSize = pageSize;
     }
 
-    Iterable<CommunicationMeasurement> retrieve() {
-        return repository.findAllByOrderByCreatedAtDesc();
+    Page<CommunicationMeasurement> retrieve(int pageNo) {
+        return repository.findAll(PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.DESC, "createdAt")));
     }
 
     @Override

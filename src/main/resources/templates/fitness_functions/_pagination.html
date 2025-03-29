@@ -1,0 +1,32 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>Bounded Context Canvas Management</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="/css/bootstrap-icons.min.css" rel="stylesheet" />
+    <link href="/css/application.css" rel="stylesheet" />\
+</head>
+<body>
+<ul th:if="${page.totalPages > 0}" id="pagination" class="pagination justify-content-end">
+    <li th:if="${page.hasPrevious()}" class="page-item">
+        <a class="page-link" th:href="${'?pageNo=' + (page.number-1)}" aria-label="Previous">
+            <span aria-hidden="true">&laquo;</span>
+        </a>
+    </li>
+    <li th:if="${!page.hasPrevious()}" class="page-item disabled">
+        <span class="page-link">&laquo;</span>
+    </li>
+    <li class="page-item disabled"><span class="page-link current-page">[[${page.number+1}]]</span></li>
+    <li th:if="${page.hasNext()}" class="page-item">
+        <a class="page-link" th:href="${'?pageNo=' + (page.number+1)}" aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+        </a>
+    </li>
+    <li th:if="${!page.hasNext()}" class="page-item disabled">
+        <span class="page-link">&raquo;</span>
+    </li>
+</ul>
+</body>
+</html>

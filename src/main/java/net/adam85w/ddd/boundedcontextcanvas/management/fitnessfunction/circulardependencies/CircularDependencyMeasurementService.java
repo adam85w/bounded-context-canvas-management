@@ -3,6 +3,11 @@ package net.adam85w.ddd.boundedcontextcanvas.management.fitnessfunction.circular
 import jakarta.transaction.Transactional;
 import net.adam85w.ddd.boundedcontextcanvas.management.CanvasOperation;
 import net.adam85w.ddd.boundedcontextcanvas.management.CanvasOperationNotifiable;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -16,13 +21,17 @@ class CircularDependencyMeasurementService implements CanvasOperationNotifiable 
 
     private final CircularDependencyMeasurementRepository repository;
 
-    CircularDependencyMeasurementService(CircularDependencyDiscoverer discoverer, CircularDependencyMeasurementRepository repository) {
+    private final int pageSize;
+
+    CircularDependencyMeasurementService(CircularDependencyDiscoverer discoverer, CircularDependencyMeasurementRepository repository,
+                                         @Value("${application.fitness-function.measurement.pagination.page-size}") int pageSize) {
         this.discoverer = discoverer;
         this.repository = repository;
+        this.pageSize = pageSize;
     }
 
-    Iterable<CircularDependencyMeasurement> retrieve() {
-        return repository.findAllByOrderByCreatedAtDesc();
+    Page<CircularDependencyMeasurement> retrieve(int pageNo) {
+        return repository.findAll(PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.DESC, "createdAt")));
     }
 
     @Override
