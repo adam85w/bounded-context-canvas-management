@@ -1,6 +1,10 @@
 package net.adam85w.ddd.boundedcontextcanvas.management;
 
-enum ValidationRuleType {
+import java.util.Set;
 
-    CREATE, UPDATE
+public enum ValidationRuleType {
+
+    CREATE, UPDATE;
+
+    static final Set<ValidationRuleType> ALL = Set.of(CREATE, UPDATE) ;
 }

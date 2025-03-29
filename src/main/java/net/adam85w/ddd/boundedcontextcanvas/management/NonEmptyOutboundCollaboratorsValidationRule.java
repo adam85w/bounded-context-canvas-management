@@ -6,11 +6,11 @@ import org.springframework.stereotype.Component;
 import java.util.Set;
 
 @Component
-class InvalidNameValidationRule implements ValidationRule {
+class NonEmptyOutboundCollaboratorsValidationRule implements ValidationRule {
 
     @Override
     public String getMessage() {
-        return "The name of a bounded context should not be empty and must have at least 3 characters.";
+        return "You should specify all collaborator names for outbound communications.";
     }
 
     @Override
@@ -20,6 +20,6 @@ class InvalidNameValidationRule implements ValidationRule {
 
     @Override
     public boolean test(BoundedContext boundedContext) {
-        return boundedContext.getName().isBlank() || boundedContext.getName().length() <= 3;
+        return boundedContext.getOutboundCommunication().stream().anyMatch(CommunicationValidationRuleHelper::isAnyCollaboratorNameEmpty);
     }
 }
