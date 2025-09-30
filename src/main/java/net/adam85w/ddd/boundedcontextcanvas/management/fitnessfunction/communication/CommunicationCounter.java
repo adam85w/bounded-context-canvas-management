@@ -8,6 +8,7 @@ import net.adam85w.ddd.boundedcontextcanvas.model.BoundedContext;
 import net.adam85w.ddd.boundedcontextcanvas.model.communication.Collaborator;
 import net.adam85w.ddd.boundedcontextcanvas.model.communication.Message;
 import net.adam85w.ddd.boundedcontextcanvas.model.communication.MessageType;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -16,6 +17,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Component
+@ConditionalOnProperty(prefix = "application.fitness-function", value = "enabled", havingValue = "true")
 class CommunicationCounter {
 
     private final BoundedContextAwareService service;

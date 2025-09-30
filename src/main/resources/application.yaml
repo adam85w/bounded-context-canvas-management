@@ -41,6 +41,7 @@ application:
   diagram:
     url: http://localhost:8085/plantuml/png/
   fitness-function:
+    enabled: true
     measurement:
       pagination:
         page-size: 20

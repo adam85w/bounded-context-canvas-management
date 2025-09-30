@@ -46,10 +46,10 @@ class CanvasController {
     }
 
     @GetMapping({"/list", "/"})
-    String list(@RequestParam(name="searchPhrase", required = false) String searchPhrase,
+    String list(Model model,
+                @RequestParam(name="searchPhrase", required = false) String searchPhrase,
                 @RequestParam(name="action", defaultValue = "EMPTY") Action action,
-                @RequestParam(name="name", required = false) String canvasName,
-                Model model) {
+                @RequestParam(name="name", required = false) String canvasName) {
         if (Action.EMPTY != action) {
             model.addAttribute("action", action);
             model.addAttribute("canvasName", new String(Base64.getDecoder().decode(canvasName)));
@@ -66,7 +66,7 @@ class CanvasController {
     }
 
     @GetMapping("/add")
-    String add(@RequestParam(name="example", defaultValue = "false") boolean example, Model model) {
+    String add(Model model,@RequestParam(name="example", defaultValue = "false") boolean example) {
         model.addAttribute("id", 0);
         model.addAttribute("title", "Adding a new Bounded Context Canvas");
         if (example) {
@@ -112,7 +112,7 @@ class CanvasController {
     }
 
     @GetMapping("/load")
-    String load() {
+    String load(Model model) {
         return "canvas/load";
     }
 

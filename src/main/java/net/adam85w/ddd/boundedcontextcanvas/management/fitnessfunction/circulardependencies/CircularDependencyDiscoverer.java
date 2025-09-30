@@ -9,6 +9,7 @@ import net.adam85w.ddd.boundedcontextcanvas.model.BoundedContext;
 import net.adam85w.ddd.boundedcontextcanvas.model.Communication;
 import net.adam85w.ddd.boundedcontextcanvas.model.communication.Collaborator;
 import net.adam85w.ddd.boundedcontextcanvas.model.communication.Message;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -18,6 +19,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
+@ConditionalOnProperty(prefix = "application.fitness-function", value = "enabled", havingValue = "true")
 class CircularDependencyDiscoverer {
 
     private final BoundedContextAwareService service;

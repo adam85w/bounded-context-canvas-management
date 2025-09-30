@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import net.adam85w.ddd.boundedcontextcanvas.management.CanvasOperation;
 import net.adam85w.ddd.boundedcontextcanvas.management.CanvasOperationNotifiable;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -14,6 +15,7 @@ import java.time.LocalDateTime;
 
 @Service
 @Transactional(Transactional.TxType.REQUIRED)
+@ConditionalOnProperty(prefix = "application.fitness-function", value = "enabled", havingValue = "true")
 class CouplingMeasurementService implements CanvasOperationNotifiable {
 
     private final CouplingCounter counter;

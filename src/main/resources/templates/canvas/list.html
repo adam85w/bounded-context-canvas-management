@@ -89,6 +89,7 @@
                     <li class="nav-item">
                         <a href="/load" class="nav-link">Load</a>
                     </li>
+                    <th:block th:if="${fitnessFunctionEnabled}">
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             Fitness functions
@@ -99,6 +100,7 @@
                             <li><a class="dropdown-item" href="/fitness-functions/couplings">Couplings</a></li>
                         </ul>
                     </li>
+                    </th:block>
                 </ul>
             </div>
             <form action="/list" class="d-flex" role="search">
