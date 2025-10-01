@@ -520,7 +520,7 @@
                     <div class="col-4">
                         <h5 class="text-start">Inbound Communication &nbsp; <i title="add verification metric" class="bi bi-journal-plus add clickable inbound-communication-add"></i></h5>
                         <ul id="inbound-communication" class="input">
-                            <li class="text-start" style="border-bottom: 2px solid #eee" th:if="${boundedContext?.inboundCommunication == null || boundedContext?.inboundCommunication?.isEmpty()}">
+                            <li class="text-start" style="border-bottom: 2px solid #eee" th:if="${id == 0 && (boundedContext?.inboundCommunication == null || boundedContext?.inboundCommunication?.isEmpty())}">
                                 <div class="row">
                                     <div class="col-6">
                                         <div class="m-1">
@@ -683,7 +683,7 @@
                     <div class="col-4">
                         <h5 class="text-start">Outbound Communication &nbsp; <i title="add verification metric" class="bi bi-journal-plus add clickable outbound-communication-add"></i></h5>
                         <ul id="outbound-communication" class="input">
-                            <li class="text-start" style="border-bottom: 2px solid #eee" th:if="${boundedContext?.outboundCommunication == null || boundedContext?.outboundCommunication?.isEmpty()}">
+                            <li class="text-start" style="border-bottom: 2px solid #eee" th:if="${id == 0 && (boundedContext?.outboundCommunication == null || boundedContext?.outboundCommunication?.isEmpty())}">
                                 <div class="row">
                                     <div class="col-6">
                                         <div class="m-1">
