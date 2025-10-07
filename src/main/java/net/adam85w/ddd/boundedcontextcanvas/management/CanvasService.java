@@ -44,6 +44,10 @@ class CanvasService implements BoundedContextAwareService {
         return repository.findByIdInOrderByUpdatedAtDesc(ids);
     }
 
+    public Iterable<? extends BoundedContextAware> obtain(LocalDateTime updatedAt) {
+        return repository.findByUpdatedAtLessThanEqual(updatedAt);
+    }
+
     @Override
     public Iterable<? extends BoundedContextAware> obtainAll() {
         return repository.findAllByOrderByUpdatedAtDesc();
@@ -73,30 +77,33 @@ class CanvasService implements BoundedContextAwareService {
     }
 
     void delete(long id, int version) {
+        var timestamp = LocalDateTime.now();
         Canvas entity = repository.findById(id).orElseThrow(() -> new CanvasNotFoundException("The canvas doesn't exist or was removed."));
         if (entity.getVersion() != version) {
             throw new CanvasOperationConflictException("TThe canvas was modified by a different user! Please refresh and check for changes.");
         }
         repository.delete(entity);
-        canvasOperationRepository.save(new CanvasOperation(entity.getName(), OperationType.REMOVE, LocalDateTime.now()));
+        canvasOperationRepository.save(new CanvasOperation(entity.getName(), OperationType.REMOVE, timestamp));
     }
 
     private Canvas insert(BoundedContext boundedContext) throws JsonProcessingException {
+        var timestamp = LocalDateTime.now();
         validationRulesForCreate.stream()
                 .filter(validationRule -> validationRule.test(boundedContext))
                 .findFirst()
                 .ifPresent(validationRule -> { throw new ValidationException(validationRule.getMessage()); });
-        canvasOperationRepository.save(new CanvasOperation(boundedContext.getName(), OperationType.ADD, LocalDateTime.now()));
-        return repository.save(new Canvas(boundedContext.getName(), mapper.writeValueAsString(boundedContext), LocalDateTime.now()));
+        canvasOperationRepository.save(new CanvasOperation(boundedContext.getName(), OperationType.ADD, timestamp));
+        return repository.save(new Canvas(boundedContext.getName(), mapper.writeValueAsString(boundedContext), timestamp));
     }
 
     private Canvas update(Canvas entity, BoundedContext boundedContext) throws JsonProcessingException {
+        var timestamp = LocalDateTime.now();
         validationRulesForUpdate.stream()
                 .filter(validationRule -> validationRule.test(boundedContext))
                 .findFirst()
                 .ifPresent(validationRule -> { throw new ValidationException(validationRule.getMessage()); });
-        entity.update(mapper.writeValueAsString(boundedContext), LocalDateTime.now());
-        canvasOperationRepository.save(new CanvasOperation(entity.getName(), OperationType.EDIT, LocalDateTime.now()));
+        entity.update(mapper.writeValueAsString(boundedContext), timestamp);
+        canvasOperationRepository.save(new CanvasOperation(entity.getName(), OperationType.EDIT, timestamp));
         return repository.save(entity);
     }
 }

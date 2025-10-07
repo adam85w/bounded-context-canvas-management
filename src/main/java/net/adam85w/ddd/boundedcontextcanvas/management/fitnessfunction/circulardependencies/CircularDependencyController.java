@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 @Controller
 @RequestMapping("/fitness-functions/circular-dependencies")
@@ -25,7 +26,7 @@ class CircularDependencyController {
 
     @GetMapping
     String discover(Model model, @RequestParam(name = "pageNo", defaultValue = "0") int pageNo) throws IOException {
-        model.addAttribute("circularDependencies", discoverer.discover());
+        model.addAttribute("circularDependencies", discoverer.discover(LocalDateTime.now()));
         model.addAttribute("page", measurementService.retrieve(pageNo));
         return "fitness_functions/circular_dependencies";
     }

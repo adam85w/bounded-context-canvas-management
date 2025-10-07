@@ -39,7 +39,7 @@ class CommunicationMeasurementService implements CanvasOperationNotifiable {
     @Override
     public void notify(CanvasOperation operation) {
         try {
-            var summaries = counter.count();
+            var summaries = counter.count(operation.getCreatedAt());
             repository.save(new CommunicationMeasurement(operation.getCanvasName(), operation.getOperationType(),
                     summaries.get(MessageType.QUERY.getName().toLowerCase()),
                     summaries.get(MessageType.COMMAND.getName().toLowerCase()),

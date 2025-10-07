@@ -3,6 +3,7 @@ package net.adam85w.ddd.boundedcontextcanvas.management;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Set;
 
@@ -14,6 +15,8 @@ interface CanvasRepository extends CrudRepository<Canvas, Long> {
     boolean existsByName(String name);
 
     Iterable<? extends BoundedContextAware> findAllByOrderByUpdatedAtDesc();
+
+    Iterable<? extends BoundedContextAware> findByUpdatedAtLessThanEqual(LocalDateTime updatedAt);
 
     Optional<Canvas> findByName(String name);
 

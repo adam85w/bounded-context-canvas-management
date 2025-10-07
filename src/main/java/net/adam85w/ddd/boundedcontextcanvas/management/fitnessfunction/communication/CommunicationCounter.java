@@ -11,6 +11,7 @@ import net.adam85w.ddd.boundedcontextcanvas.model.communication.MessageType;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -29,8 +30,8 @@ class CommunicationCounter {
         this.mapper = mapper;
     }
 
-    HashMap<String, Long> count() throws JsonProcessingException {
-        var communications = obtainCommunications();
+    HashMap<String, Long> count(LocalDateTime changeAt) throws JsonProcessingException {
+        var communications = obtainCommunications(changeAt);
         HashMap<String, Long> summaries = new HashMap<>();
         for (String communicationType : Arrays.stream(MessageType.values()).map(type -> type.getName().toLowerCase()).toList()) {
             var amount = communications.stream().filter(communication -> communicationType.equals(communication.communicationType())).count();
@@ -39,9 +40,9 @@ class CommunicationCounter {
         return summaries;
     }
 
-    private Set<Communication> obtainCommunications() throws JsonProcessingException {
+    private Set<Communication> obtainCommunications(LocalDateTime changeAt) throws JsonProcessingException {
         Set<Communication> communications = new HashSet<>();
-        for (BoundedContextAware boundedContextAware : service.obtainAll()) {
+        for (BoundedContextAware boundedContextAware : service.obtain(changeAt)) {
             BoundedContext boundedContext = mapper.readValue(boundedContextAware.retrieveContext(), BoundedContext.class);
             for (net.adam85w.ddd.boundedcontextcanvas.model.Communication communication : boundedContext.getInboundCommunication()) {
                 for (Collaborator collaborator : communication.getCollaborators()) {

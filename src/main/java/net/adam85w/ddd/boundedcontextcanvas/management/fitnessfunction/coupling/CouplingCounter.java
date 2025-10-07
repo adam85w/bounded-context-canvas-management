@@ -9,6 +9,8 @@ import net.adam85w.ddd.boundedcontextcanvas.model.Communication;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+
 @Component
 @ConditionalOnProperty(prefix = "application.fitness-function", value = "enabled", havingValue = "true")
 class CouplingCounter {
@@ -22,11 +24,11 @@ class CouplingCounter {
         this.mapper = mapper;
     }
 
-    CouplingSummary count() throws JsonProcessingException {
+    CouplingSummary count(LocalDateTime changeAt) throws JsonProcessingException {
         int afferentCouplingsCounter = 0;
         int efferentCouplingsCounter = 0;
         int componentsCounter = 0;
-        for (BoundedContextAware boundedContextAware : service.obtainAll()) {
+        for (BoundedContextAware boundedContextAware : service.obtain(changeAt)) {
             BoundedContext boundedContext = mapper.readValue(boundedContextAware.retrieveContext(), BoundedContext.class);
             componentsCounter++;
             for (Communication communication : boundedContext.getInboundCommunication()) {

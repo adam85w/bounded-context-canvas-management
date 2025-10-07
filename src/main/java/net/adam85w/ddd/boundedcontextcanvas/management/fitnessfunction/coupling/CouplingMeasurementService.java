@@ -38,7 +38,7 @@ class CouplingMeasurementService implements CanvasOperationNotifiable {
     @Override
     public void notify(CanvasOperation operation) {
         try {
-            var summary = counter.count();
+            var summary = counter.count(operation.getCreatedAt());
             repository.save(new CouplingMeasurement(
                     operation.getCanvasName(),
                     operation.getOperationType(),

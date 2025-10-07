@@ -13,6 +13,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -31,8 +32,8 @@ class CircularDependencyDiscoverer {
         this.mapper = mapper;
     }
 
-    Set<CircularDependency> discover() throws IOException {
-        Set<Relation> relations = obtainRelations();
+    Set<CircularDependency> discover(LocalDateTime changeAt) throws IOException {
+        Set<Relation> relations = obtainRelations(changeAt);
         Set<CircularDependency> circularDependencies = new HashSet<>();
         for (Relation relationA : relations) {
             for (Relation relationB : relations) {
@@ -50,9 +51,9 @@ class CircularDependencyDiscoverer {
         return circularDependencies;
     }
 
-    private Set<Relation> obtainRelations() throws JsonProcessingException {
+    private Set<Relation> obtainRelations(LocalDateTime changeAt) throws JsonProcessingException {
         Set<Relation> relations = new HashSet<>();
-        Iterable<? extends BoundedContextAware> awarenesses = service.obtainAll();
+        Iterable<? extends BoundedContextAware> awarenesses = service.obtain(changeAt);
         for (BoundedContextAware awarenessA : awarenesses) {
             BoundedContext boundedContextA = mapper.readValue(awarenessA.retrieveContext(), BoundedContext.class);
             for (BoundedContextAware awarenessB : awarenesses) {
