@@ -4,7 +4,7 @@ import net.adam85w.ddd.boundedcontextcanvas.model.communication.MessageType;
 
 enum RelationType {
 
-    QUERY("Query", "-[dotted]->"),
+    QUERY("Query", "-->"),
     COMMAND("Command", "-[dotted]->"),
     EVENT("Event", "-[dashed]->");
 
