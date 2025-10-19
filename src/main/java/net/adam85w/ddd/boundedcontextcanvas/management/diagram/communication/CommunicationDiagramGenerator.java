@@ -35,8 +35,8 @@ class CommunicationDiagramGenerator {
                 for (Collaborator collaborator : communication.getCollaborators()) {
                     components.add(new Component(collaborator.getName(), ComponentType.valueOf(collaborator.getType())));
                     for (Message message : communication.getMessages()) {
-                        relationships.add(new Relationship(new Component(boundedContext.getName(), ComponentType.valueOf(CollaboratorType.BOUNDED_CONTEXT)),
-                                new Component(collaborator.getName(), ComponentType.valueOf(collaborator.getType())),
+                        relationships.add(new Relationship(new Component(collaborator.getName(), ComponentType.valueOf(collaborator.getType())),
+                                new Component(boundedContext.getName(), ComponentType.valueOf(CollaboratorType.BOUNDED_CONTEXT)),
                                 new Relation(message.getName(), RelationType.valueOf(message.getType()))));
                     }
                 }
@@ -47,8 +47,8 @@ class CommunicationDiagramGenerator {
                         components.add(new Component(collaborator.getName(), ComponentType.valueOf(collaborator.getType())));
                     }
                     for (Message message : communication.getMessages()) {
-                        relationships.add(new Relationship(new Component(collaborator.getName(), ComponentType.valueOf(collaborator.getType())),
-                                new Component(boundedContext.getName(), ComponentType.valueOf(CollaboratorType.BOUNDED_CONTEXT)),
+                        relationships.add(new Relationship(new Component(boundedContext.getName(), ComponentType.valueOf(CollaboratorType.BOUNDED_CONTEXT)),
+                                new Component(collaborator.getName(), ComponentType.valueOf(collaborator.getType())),
                                 new Relation(message.getName(), RelationType.valueOf(message.getType()))));
                     }
                 }

@@ -32,10 +32,11 @@ class DependencyDiagramGenerator {
             components.add(new Component(boundedContext.getName(), ComponentType.valueOf(CollaboratorType.BOUNDED_CONTEXT)));
             for (Communication communication : boundedContext.getInboundCommunication()) {
                 for (Collaborator collaborator : communication.getCollaborators()) {
-                    components.add(new Component(collaborator.getName(), ComponentType.valueOf(collaborator.getType())));
-
-                    relationships.add(new Dependency(new Component(boundedContext.getName(), ComponentType.valueOf(CollaboratorType.BOUNDED_CONTEXT)),
-                                new Component(collaborator.getName(), ComponentType.valueOf(collaborator.getType()))));
+                    if (!(collaborator.getName() == null || collaborator.getName().isBlank())) {
+                        components.add(new Component(collaborator.getName(), ComponentType.valueOf(collaborator.getType())));
+                    }
+                    relationships.add(new Dependency(new Component(collaborator.getName(), ComponentType.valueOf(collaborator.getType())),
+                            new Component(boundedContext.getName(), ComponentType.valueOf(CollaboratorType.BOUNDED_CONTEXT))));
                 }
             }
             for (Communication communication : boundedContext.getOutboundCommunication()) {
@@ -43,9 +44,8 @@ class DependencyDiagramGenerator {
                     if (!(collaborator.getName() == null || collaborator.getName().isBlank())) {
                         components.add(new Component(collaborator.getName(), ComponentType.valueOf(collaborator.getType())));
                     }
-                    relationships.add(new Dependency(new Component(collaborator.getName(), ComponentType.valueOf(collaborator.getType())),
-                            new Component(boundedContext.getName(), ComponentType.valueOf(CollaboratorType.BOUNDED_CONTEXT))));
-
+                    relationships.add(new Dependency(new Component(boundedContext.getName(), ComponentType.valueOf(CollaboratorType.BOUNDED_CONTEXT)),
+                            new Component(collaborator.getName(), ComponentType.valueOf(collaborator.getType()))));
                 }
             }
         }
