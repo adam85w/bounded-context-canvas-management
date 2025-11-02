@@ -20,6 +20,6 @@ class InvalidNameValidationRule implements ValidationRule {
 
     @Override
     public boolean test(BoundedContext boundedContext) {
-        return boundedContext.getName().isBlank() || boundedContext.getName().length() <= 3;
+        return boundedContext.getName().isBlank() || boundedContext.getName().length() < 3;
     }
 }
