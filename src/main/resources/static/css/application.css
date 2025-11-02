@@ -65,3 +65,11 @@ html, body {
     width: 15%;
     text-align: center;
 }
+
+/* circular dependencies */
+ul#circular-dependencies {
+    text-align: left;
+}
+ul.ul-striped .li-strip {
+    background-color: #e9ecef;
+}

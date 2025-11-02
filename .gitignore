@@ -33,3 +33,4 @@ build/
 .vscode/
 /config/
 /start.sh
+/.gradle/*

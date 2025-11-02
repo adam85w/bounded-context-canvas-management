@@ -7,17 +7,12 @@ import net.adam85w.ddd.boundedcontextcanvas.management.BoundedContextAware;
 import net.adam85w.ddd.boundedcontextcanvas.management.BoundedContextAwareService;
 import net.adam85w.ddd.boundedcontextcanvas.model.BoundedContext;
 import net.adam85w.ddd.boundedcontextcanvas.model.Communication;
-import net.adam85w.ddd.boundedcontextcanvas.model.communication.Collaborator;
-import net.adam85w.ddd.boundedcontextcanvas.model.communication.Message;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Component
 @ConditionalOnProperty(prefix = "application.fitness-function", value = "enabled", havingValue = "true")
@@ -32,57 +27,86 @@ class CircularDependencyDiscoverer {
         this.mapper = mapper;
     }
 
-    Set<CircularDependency> discover(LocalDateTime changeAt) throws IOException {
-        Set<Relation> relations = obtainRelations(changeAt);
-        Set<CircularDependency> circularDependencies = new HashSet<>();
-        for (Relation relationA : relations) {
-            for (Relation relationB : relations) {
-                if (relationA.equals(relationB)) {
-                    continue;
-                }
-                if (relationA.componentA().equals(relationB.componentB())) {
-                    if (circularDependencies.contains(new CircularDependency(relationB, relationA)))  {
-                        continue;
-                    }
-                    circularDependencies.add(new CircularDependency(relationA, relationB));
-                }
-            }
-        }
-        return circularDependencies;
+    Set<List<Relation>> discover(LocalDateTime changeAt) throws IOException {
+        Set<Relation> relations = obtainSimpleRelations(changeAt);
+        Set<List<Relation>> chains = createAllChains(relations);
+        return removeDuplicates(findAllCircularDependency(chains));
     }
 
-    private Set<Relation> obtainRelations(LocalDateTime changeAt) throws JsonProcessingException {
+    private Set<Relation> obtainSimpleRelations(LocalDateTime changeAt) throws JsonProcessingException {
         Set<Relation> relations = new HashSet<>();
-        Iterable<? extends BoundedContextAware> awarenesses = service.obtain(changeAt);
-        for (BoundedContextAware awarenessA : awarenesses) {
-            BoundedContext boundedContextA = mapper.readValue(awarenessA.retrieveContext(), BoundedContext.class);
-            for (BoundedContextAware awarenessB : awarenesses) {
-                if (awarenessA.retrieveContext().equals(awarenessB.retrieveContext())) {
-                    continue;
-                }
-                BoundedContext boundedContextB = mapper.readValue(awarenessB.retrieveContext(), BoundedContext.class);
-                for (Communication inbound : boundedContextB.getInboundCommunication()) {
-                    for (Collaborator collaborator : inbound.getCollaborators()) {
-                        if (collaborator.getName().equals(boundedContextA.getName())) {
-                            relations.add(new Relation(boundedContextA.getName(), obtainRelationTypes(inbound.getMessages()), boundedContextB.getName()));
-                        }
-                    }
-                }
-                for (Communication outbound : boundedContextB.getOutboundCommunication()) {
-                    for (Collaborator collaborator : outbound.getCollaborators()) {
-                        if (collaborator.getName().equals(boundedContextA.getName())) {
-                            relations.add(new Relation(boundedContextB.getName(), obtainRelationTypes(outbound.getMessages()), boundedContextA.getName()));
-                        }
-                    }
-                }
+        for (BoundedContextAware awareness : service.obtain(changeAt)) {
+            BoundedContext boundedContext = mapper.readValue(awareness.retrieveContext(), BoundedContext.class);
+            for (Communication communication : boundedContext.getInboundCommunication()) {
+                communication.getCollaborators().forEach(collaborator -> relations.add(new Relation(collaborator.getName(), boundedContext.getName())));
+            }
+            for (Communication communication : boundedContext.getOutboundCommunication()) {
+                communication.getCollaborators().forEach(collaborator -> relations.add(new Relation(boundedContext.getName(), collaborator.getName())));
             }
         }
         return relations;
     }
 
-    private String obtainRelationTypes(List<Message> messages) {
-        return String.join(", ", messages.stream()
-                .map(message -> message.getType().getName().toLowerCase())
-                .collect(Collectors.toSet()));
+    private Set<List<Relation>> createAllChains(Set<Relation> relations) {
+        Set<List<Relation>> chains = new HashSet<>();
+        for (Relation relation : relations) {
+            chains.addAll(createChains(relation, relations));
+        }
+        return chains;
     }
+
+    private Set<List<Relation>> createChains(Relation relation, Set<Relation> relations) {
+        Set<List<Relation>> chains = new HashSet<>();
+        for (Relation possibleRelation : relations) {
+            if (relation.componentB().equalsIgnoreCase(possibleRelation.componentA())) {
+                LinkedList<Relation> chain = new LinkedList<>();
+                chain.add(relation);
+                chain.add(possibleRelation);
+                chains.add(chain);
+                appendChain(chain, relations);
+            }
+        }
+        return chains;
+    }
+
+    private List<Relation> appendChain(List<Relation> chain, Set<Relation> relations) {
+        for (Relation relation : relations) {
+            if (chain.getLast().componentB().equalsIgnoreCase(relation.componentA())) {
+                chain.add(relation);
+                if (chain.getFirst().equals(relation)) {
+                    return chain;
+                }
+                return appendChain(chain, relations);
+            }
+        }
+        return chain;
+    }
+
+    private Set<List<Relation>> findAllCircularDependency(Set<List<Relation>> chains) {
+        Set<List<Relation>> circularDependencies = new HashSet<>();
+        for (List<Relation> chain : chains) {
+            if (chain.getFirst().equals(chain.getLast())) {
+                circularDependencies.add(chain);
+            }
+        }
+        return circularDependencies;
+    }
+
+    private Set<List<Relation>> removeDuplicates(Set<List<Relation>> chains) {
+        Set<List<Relation>> distinctChains = new HashSet<>();
+        for (List<Relation> chain : chains) {
+            var distinct = true;
+            for (List<Relation> added : distinctChains) {
+                if (new HashSet<>(chain).containsAll(added)) {
+                    distinct = false;
+                    break;
+                }
+            }
+            if (distinct) {
+                distinctChains.add(chain);
+            }
+        }
+        return distinctChains;
+    }
+
 }

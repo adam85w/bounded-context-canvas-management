@@ -1,4 +1,6 @@
 package net.adam85w.ddd.boundedcontextcanvas.management.fitnessfunction.circulardependencies;
 
-record CircularDependency(Relation relationA, Relation relationB) {
+import java.util.List;
+
+public record CircularDependency(String title, List<Relation> chain, String diagram) {
 }

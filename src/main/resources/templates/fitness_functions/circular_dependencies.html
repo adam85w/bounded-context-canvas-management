@@ -41,31 +41,17 @@
         <div class="container mx-auto text-center border border-secondary m-4">
             <h1>Circular dependencies</h1>
             <p th:if="${circularDependencies.isEmpty()}">There are no circular dependencies.</p>
-            <table class="table table-striped" th:if="${!circularDependencies.isEmpty()}">
-                <thead>
-                    <tr>
-                        <th>No.</th>
-                        <th>Component name</th>
-                        <th>Relation type</th>
-                        <th>Component name</th>
-                    </tr>
-                </thead>
-                <tbody>
-                <th:block th:each="circularDependency, stat: ${circularDependencies}">
-                    <tr>
-                        <td rowspan="2">[[${stat.index+1}]]</td>
-                        <td>[[${circularDependency.relationA.componentA}]]</td>
-                        <td>[[${circularDependency.relationA.type}]]</td>
-                        <td>[[${circularDependency.relationA.componentB}]]</td>
-                    </tr>
-                    <tr>
-                        <td>[[${circularDependency.relationB.componentA}]]</td>
-                        <td>[[${circularDependency.relationB.type}]]</td>
-                        <td>[[${circularDependency.relationB.componentB}]]</td>
-                    </tr>
-                </th:block>
-                </tbody>
-            </table>
+            <ul th:if="${!circularDependencies.isEmpty()}" id="circular-dependencies" class="list-group list-group-numbered ul-striped">
+            <th:block th:each="circularDependency, stat: ${circularDependencies}">
+                <li th:class="${!stat.odd} ? 'li-strip list-group-item' : 'list-group-item'"><a data-bs-toggle="collapse" th:href="'#circular-dependencies-' + ${stat.index}" role="button" aria-expanded="false" th:aria-controls="'circular-dependencies-' + ${stat.index}">[[${circularDependency.title()}]]</a><br />
+                    <div class="collapse" th:id="'circular-dependencies-' + ${stat.index}">
+                        <div class="card card-body">
+                        <a th:href="${@environment.getProperty('application.diagram.url') + circularDependency.diagram()}" target="_blank"><img th:src="${@environment.getProperty('application.diagram.url') + circularDependency.diagram()}" alt="diagram" /></a>
+                        </div>
+                    </div>
+                </li>
+            </th:block>
+            </ul>
             <h1>History of measurements</h1>
             <p th:if="${page.totalElements <= 0}">No measurements have been recorded so far.</p>
             <table class="table table-striped" th:if="${!page.isEmpty()}">
