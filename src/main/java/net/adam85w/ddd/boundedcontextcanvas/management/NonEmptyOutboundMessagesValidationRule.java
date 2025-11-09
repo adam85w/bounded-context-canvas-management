@@ -20,6 +20,6 @@ class NonEmptyOutboundMessagesValidationRule implements ValidationRule {
 
     @Override
     public boolean test(BoundedContext boundedContext) {
-        return boundedContext.getOutboundCommunication().stream().anyMatch(CommunicationValidationRuleHelper::isAnyMessageNameEmpty);
+        return boundedContext.getOutboundCommunication().stream().anyMatch(ValidationRuleHelper::isAnyMessageNameEmpty);
     }
 }

@@ -10,7 +10,8 @@ class NonEmptyInboundCollaboratorsValidationRule implements ValidationRule {
 
     @Override
     public String getMessage() {
-        return "You should specify all collaborator names for inbound communications.";
+        return String.format("You should specify all collaborator names with a minimum length of %s characters for inbound communications.",
+                ValidationRuleHelper.MIN_COLLABORATOR_NAME_LENGTH);
     }
 
     @Override
@@ -20,6 +21,7 @@ class NonEmptyInboundCollaboratorsValidationRule implements ValidationRule {
 
     @Override
     public boolean test(BoundedContext boundedContext) {
-        return boundedContext.getInboundCommunication().stream().anyMatch(CommunicationValidationRuleHelper::isAnyCollaboratorNameEmpty);
+        return boundedContext.getInboundCommunication().stream().anyMatch(ValidationRuleHelper::isAnyCollaboratorNameEmpty) ||
+                boundedContext.getInboundCommunication().stream().anyMatch(ValidationRuleHelper::isAnyCollaboratorNameIncorrectLength);
     }
 }

@@ -10,7 +10,8 @@ class InvalidNameValidationRule implements ValidationRule {
 
     @Override
     public String getMessage() {
-        return "The name of a bounded context should not be empty and must have at least 3 characters.";
+        return String.format("The name of a bounded context should not be empty and must have at least %s characters.",
+                ValidationRuleHelper.MIN_COLLABORATOR_NAME_LENGTH);
     }
 
     @Override
@@ -20,6 +21,6 @@ class InvalidNameValidationRule implements ValidationRule {
 
     @Override
     public boolean test(BoundedContext boundedContext) {
-        return boundedContext.getName().isBlank() || boundedContext.getName().length() < 3;
+        return boundedContext.getName().isBlank() || boundedContext.getName().length() < ValidationRuleHelper.MIN_COLLABORATOR_NAME_LENGTH;
     }
 }
