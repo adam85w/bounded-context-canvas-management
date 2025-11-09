@@ -7,6 +7,9 @@ import net.adam85w.ddd.boundedcontextcanvas.management.BoundedContextAware;
 import net.adam85w.ddd.boundedcontextcanvas.management.BoundedContextAwareService;
 import net.adam85w.ddd.boundedcontextcanvas.model.BoundedContext;
 import net.adam85w.ddd.boundedcontextcanvas.model.Communication;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
@@ -18,18 +21,31 @@ import java.util.*;
 @ConditionalOnProperty(prefix = "application.fitness-function", value = "enabled", havingValue = "true")
 class CircularDependencyDiscoverer {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(CircularDependencyDiscoverer.class);
+
     private final BoundedContextAwareService service;
 
     private final ObjectMapper mapper;
 
-    CircularDependencyDiscoverer(BoundedContextAwareService service, ObjectMapper mapper) {
+    private final boolean debug;
+
+    private final int limit;
+
+    CircularDependencyDiscoverer(BoundedContextAwareService service, ObjectMapper mapper,
+                                 @Value("${application.fitness-function.circular-dependencies.limit:10}") int limit,
+                                 @Value("${application.fitness-function.circular-dependencies.debug:false}") boolean debug) {
         this.service = service;
         this.mapper = mapper;
+        this.limit = limit;
+        this.debug = debug;
     }
 
     Set<List<Relation>> discover(LocalDateTime changeAt) throws IOException {
         Set<Relation> relations = obtainSimpleRelations(changeAt);
         Set<List<Relation>> chains = createAllChains(relations);
+        if (debug) {
+            printChains(chains);
+        }
         return removeDuplicates(findAllCircularDependency(chains));
     }
 
@@ -63,23 +79,29 @@ class CircularDependencyDiscoverer {
                 chain.add(relation);
                 chain.add(possibleRelation);
                 chains.add(chain);
-                appendChain(chain, relations);
+                chains.addAll(appendChain(chain, relations, 0));
             }
         }
         return chains;
     }
 
-    private List<Relation> appendChain(List<Relation> chain, Set<Relation> relations) {
-        for (Relation relation : relations) {
-            if (chain.getLast().componentB().equalsIgnoreCase(relation.componentA())) {
-                chain.add(relation);
-                if (chain.getFirst().equals(relation)) {
-                    return chain;
+    private Set<List<Relation>> appendChain(List<Relation> chain, Set<Relation> relations, int deep) {
+        Set<List<Relation>> chains = new HashSet<>();
+        if (deep < limit) {
+            for (Relation relation : relations) {
+                if (chain.getLast().componentB().equalsIgnoreCase(relation.componentA())) {
+                    chain.add(relation);
+                    if (chain.getFirst().equals(relation) || chain.get(chain.size()-3).equals(relation)) {
+                        chains.add(new LinkedList<>(chain));
+                        chain.removeLast();
+                        continue;
+                    }
+                    chains.addAll(appendChain(chain, relations, deep + 1));
+                    chain.removeLast();
                 }
-                return appendChain(chain, relations);
             }
         }
-        return chain;
+        return chains;
     }
 
     private Set<List<Relation>> findAllCircularDependency(Set<List<Relation>> chains) {
@@ -109,4 +131,13 @@ class CircularDependencyDiscoverer {
         return distinctChains;
     }
 
+    private void printChains(Set<List<Relation>> chains) {
+        for (List<Relation> chain : chains) {
+            StringBuilder chainString = new StringBuilder();
+            for (Relation relation : chain) {
+                chainString.append("[" + relation.componentA() + " -> " + relation.componentB() + "] -> ");
+            }
+            LOGGER.info(chainString.replace(chainString.length()-" -> ".length(), chainString.length(), "").toString());
+        }
+    }
 }
