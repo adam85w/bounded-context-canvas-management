@@ -109,7 +109,7 @@
             </form>
         </div>
     </nav>
-    <th:block th:insert="canvas/_generate.html :: #generate-canvas-form"></th:block>
+    <th:block th:insert="~{canvas/_generate.html :: #generate-canvas-form}"></th:block>
     <div id="alerts">
         <th:block th:if="${action != null}">
             <div class="auto-closable-alert container alert alert-success alert-dismissible fade show" role="alert">
