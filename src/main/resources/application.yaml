@@ -39,7 +39,7 @@ application:
     example:
       file-name: example.json
   diagram:
-    url: http://localhost:8085/plantuml/png/
+    url: http://kroki:8085/plantuml/png/
   fitness-function:
     enabled: true
     measurement:

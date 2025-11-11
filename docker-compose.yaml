@@ -13,12 +13,12 @@ services:
       kroki:
         condition: service_started
   kroki:
-    image: docker.io/yuzutech/kroki:0.26.0
+    image: docker.io/yuzutech/kroki:0.28.0
     restart: always
     ports:
       - "8085:8000"
   bounded-context-canvas:
-    image: docker.io/adam85w/bounded-context-canvas:3.2.1
+    image: docker.io/adam85w/bounded-context-canvas:3.3.0
     restart: unless-stopped
     ports:
       - "8083:8083"
