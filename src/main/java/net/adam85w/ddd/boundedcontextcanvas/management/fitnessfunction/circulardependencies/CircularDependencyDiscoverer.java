@@ -91,7 +91,7 @@ class CircularDependencyDiscoverer {
             for (Relation relation : relations) {
                 if (chain.getLast().componentB().equalsIgnoreCase(relation.componentA())) {
                     chain.add(relation);
-                    if (chain.getFirst().equals(relation) || chain.get(chain.size()-3).equals(relation)) {
+                    if (chain.stream().limit(chain.size()-1).anyMatch(link -> link.equals(relation))) {
                         chains.add(new LinkedList<>(chain));
                         chain.removeLast();
                         continue;
