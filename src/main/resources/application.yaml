@@ -47,3 +47,5 @@ application:
         page-size: 20
   operation-notification:
     scheduler: 5000
+  canvas-log-cleaner:
+    scheduler: 60000

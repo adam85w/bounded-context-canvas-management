@@ -41,7 +41,7 @@ class CircularDependencyMeasurementService implements CanvasOperationNotifiable 
             repository.save(new CircularDependencyMeasurement(
                     operation.getCanvasName(),
                     operation.getOperationType(),
-                    discoverer.discover(operation.getCreatedAt()).size(),
+                    discoverer.discover(operation).size(),
                     LocalDateTime.now()));
         } catch (IOException e) {
             throw new RuntimeException(e);

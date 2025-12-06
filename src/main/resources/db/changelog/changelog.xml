@@ -120,4 +120,24 @@
             </column>
         </createTable>
     </changeSet>
+    <changeSet id="3" author="adam85w">
+        <createTable tableName="canvas_log">
+            <column name="id" type="int">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="canvas_operation_id" type="int">
+                <constraints foreignKeyName="fk_canvas_operation_id" referencedTableName="canvas_operation" referencedColumnNames="id" nullable="false" />
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="context" type="BLOB">
+                <constraints nullable="false" />
+            </column>
+            <column name="created_at" type="DATETIME(6)">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+        <createSequence sequenceName="canvas_log_seq" incrementBy="100" cacheSize="100" />
+    </changeSet>
 </databaseChangeLog>

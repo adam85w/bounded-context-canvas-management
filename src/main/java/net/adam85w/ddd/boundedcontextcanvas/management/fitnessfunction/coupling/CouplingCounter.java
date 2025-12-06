@@ -4,12 +4,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.adam85w.ddd.boundedcontextcanvas.management.BoundedContextAware;
 import net.adam85w.ddd.boundedcontextcanvas.management.BoundedContextAwareService;
+import net.adam85w.ddd.boundedcontextcanvas.management.CanvasOperation;
 import net.adam85w.ddd.boundedcontextcanvas.model.BoundedContext;
 import net.adam85w.ddd.boundedcontextcanvas.model.Communication;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
-
-import java.time.LocalDateTime;
 
 @Component
 @ConditionalOnProperty(prefix = "application.fitness-function", value = "enabled", havingValue = "true")
@@ -24,11 +23,11 @@ class CouplingCounter {
         this.mapper = mapper;
     }
 
-    CouplingSummary count(LocalDateTime changeAt) throws JsonProcessingException {
+    CouplingSummary count(CanvasOperation operation) throws JsonProcessingException {
         int afferentCouplingsCounter = 0;
         int efferentCouplingsCounter = 0;
         int componentsCounter = 0;
-        for (BoundedContextAware boundedContextAware : service.obtain(changeAt)) {
+        for (BoundedContextAware boundedContextAware : service.obtain(operation)) {
             BoundedContext boundedContext = mapper.readValue(boundedContextAware.retrieveContext(), BoundedContext.class);
             componentsCounter++;
             for (Communication communication : boundedContext.getInboundCommunication()) {

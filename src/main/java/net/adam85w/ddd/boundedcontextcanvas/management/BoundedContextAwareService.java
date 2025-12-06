@@ -15,5 +15,7 @@ public interface BoundedContextAwareService {
 
     Iterable<? extends BoundedContextAware> obtain(LocalDateTime updatedAt);
 
+    Iterable<? extends BoundedContextAware> obtain(CanvasOperation operation);
+
     Iterable<? extends BoundedContextAware> obtainAll();
 }

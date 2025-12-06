@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 @Transactional
@@ -22,13 +23,16 @@ class CanvasService implements BoundedContextAwareService {
 
     private final CanvasOperationRepository canvasOperationRepository;
 
+    private final CanvasLogRepository canvasLogRepository;
+
     private final Set<ValidationRule> validationRulesForCreate;
 
     private final Set<ValidationRule> validationRulesForUpdate;
 
-    CanvasService(CanvasRepository repository, CanvasOperationRepository canvasOperationRepository, ObjectMapper mapper, Set<ValidationRule> validationRules) {
+    CanvasService(CanvasRepository repository, CanvasOperationRepository canvasOperationRepository, CanvasLogRepository canvasLogRepository, ObjectMapper mapper, Set<ValidationRule> validationRules) {
         this.repository = repository;
         this.canvasOperationRepository = canvasOperationRepository;
+        this.canvasLogRepository = canvasLogRepository;
         this.mapper = mapper;
         this.validationRulesForCreate = validationRules.stream().filter(validationRule -> validationRule.getTypes().contains(ValidationRuleType.CREATE)).collect(Collectors.toSet());
         this.validationRulesForUpdate = validationRules.stream().filter(validationRule -> validationRule.getTypes().contains(ValidationRuleType.UPDATE)).collect(Collectors.toSet());
@@ -46,6 +50,11 @@ class CanvasService implements BoundedContextAwareService {
 
     public Iterable<? extends BoundedContextAware> obtain(LocalDateTime updatedAt) {
         return repository.findByUpdatedAtLessThanEqual(updatedAt);
+    }
+
+    @Override
+    public Iterable<? extends BoundedContextAware> obtain(CanvasOperation operation) {
+        return canvasLogRepository.findByCanvasOperationId(operation.getId());
     }
 
     @Override
@@ -83,7 +92,11 @@ class CanvasService implements BoundedContextAwareService {
             throw new CanvasOperationConflictException("TThe canvas was modified by a different user! Please refresh and check for changes.");
         }
         repository.delete(entity);
-        canvasOperationRepository.save(new CanvasOperation(entity.getName(), OperationType.REMOVE, timestamp));
+        var operation = canvasOperationRepository.save(new CanvasOperation(entity.getName(), OperationType.REMOVE, timestamp));
+        var canvasLogs = StreamSupport.stream(repository.findByUpdatedAtLessThanEqual(timestamp).spliterator(), false)
+                .map(c -> new CanvasLog(((Canvas) c).getName(), c.retrieveContext(), operation.getId(), timestamp))
+                .toList();
+        canvasLogRepository.saveAll(canvasLogs);
     }
 
     private Canvas insert(BoundedContext boundedContext) throws JsonProcessingException {
@@ -92,8 +105,13 @@ class CanvasService implements BoundedContextAwareService {
                 .filter(validationRule -> validationRule.test(boundedContext))
                 .findFirst()
                 .ifPresent(validationRule -> { throw new ValidationException(validationRule.getMessage()); });
-        canvasOperationRepository.save(new CanvasOperation(boundedContext.getName(), OperationType.ADD, timestamp));
-        return repository.save(new Canvas(boundedContext.getName(), mapper.writeValueAsString(boundedContext), timestamp));
+        var canvas = repository.save(new Canvas(boundedContext.getName(), mapper.writeValueAsString(boundedContext), timestamp));
+        var operation = canvasOperationRepository.save(new CanvasOperation(boundedContext.getName(), OperationType.ADD, timestamp));
+        var canvasLogs = StreamSupport.stream(repository.findByUpdatedAtLessThanEqual(timestamp).spliterator(), false)
+                .map(c -> new CanvasLog(((Canvas) c).getName(), c.retrieveContext(), operation.getId(), timestamp))
+                .toList();
+        canvasLogRepository.saveAll(canvasLogs);
+        return canvas;
     }
 
     private Canvas update(Canvas entity, BoundedContext boundedContext) throws JsonProcessingException {
@@ -103,7 +121,12 @@ class CanvasService implements BoundedContextAwareService {
                 .findFirst()
                 .ifPresent(validationRule -> { throw new ValidationException(validationRule.getMessage()); });
         entity.update(mapper.writeValueAsString(boundedContext), timestamp);
-        canvasOperationRepository.save(new CanvasOperation(entity.getName(), OperationType.EDIT, timestamp));
-        return repository.save(entity);
+        var canvas = repository.save(entity);
+        var operation = canvasOperationRepository.save(new CanvasOperation(entity.getName(), OperationType.EDIT, timestamp));
+        var canvasLogs = StreamSupport.stream(repository.findByUpdatedAtLessThanEqual(timestamp).spliterator(), false)
+                .map(c -> new CanvasLog(((Canvas) c).getName(), c.retrieveContext(), operation.getId(), timestamp))
+                .toList();
+        canvasLogRepository.saveAll(canvasLogs);
+        return canvas;
     }
 }

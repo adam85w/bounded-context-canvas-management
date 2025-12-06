@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.adam85w.ddd.boundedcontextcanvas.management.BoundedContextAware;
 import net.adam85w.ddd.boundedcontextcanvas.management.BoundedContextAwareService;
+import net.adam85w.ddd.boundedcontextcanvas.management.CanvasOperation;
 import net.adam85w.ddd.boundedcontextcanvas.model.BoundedContext;
 import net.adam85w.ddd.boundedcontextcanvas.model.Communication;
 import org.slf4j.Logger;
@@ -40,8 +41,16 @@ class CircularDependencyDiscoverer {
         this.debug = debug;
     }
 
-    Set<List<Relation>> discover(LocalDateTime changeAt) throws IOException {
-        Set<Relation> relations = obtainSimpleRelations(changeAt);
+    Set<List<Relation>> discover(LocalDateTime timestamp) throws IOException {
+        return discover(service.obtain(timestamp));
+    }
+
+    Set<List<Relation>> discover(CanvasOperation operation) throws IOException {
+        return discover(service.obtain(operation));
+    }
+
+    private Set<List<Relation>> discover(Iterable<? extends BoundedContextAware> boundedContextAwarenesses) throws IOException {
+        Set<Relation> relations = obtainSimpleRelations(boundedContextAwarenesses);
         Set<List<Relation>> chains = createAllChains(relations);
         if (debug) {
             printChains(chains);
@@ -49,9 +58,9 @@ class CircularDependencyDiscoverer {
         return removeDuplicates(findAllCircularDependency(chains));
     }
 
-    private Set<Relation> obtainSimpleRelations(LocalDateTime changeAt) throws JsonProcessingException {
+    private Set<Relation> obtainSimpleRelations(Iterable<? extends BoundedContextAware> boundedContextAwarenesses) throws JsonProcessingException {
         Set<Relation> relations = new HashSet<>();
-        for (BoundedContextAware awareness : service.obtain(changeAt)) {
+        for (BoundedContextAware awareness : boundedContextAwarenesses) {
             BoundedContext boundedContext = mapper.readValue(awareness.retrieveContext(), BoundedContext.class);
             for (Communication communication : boundedContext.getInboundCommunication()) {
                 communication.getCollaborators().forEach(collaborator -> relations.add(new Relation(collaborator.getName(), boundedContext.getName())));

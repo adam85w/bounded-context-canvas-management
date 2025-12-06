@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.adam85w.ddd.boundedcontextcanvas.management.BoundedContextAware;
 import net.adam85w.ddd.boundedcontextcanvas.management.BoundedContextAwareService;
+import net.adam85w.ddd.boundedcontextcanvas.management.CanvasOperation;
 import net.adam85w.ddd.boundedcontextcanvas.model.BoundedContext;
 import net.adam85w.ddd.boundedcontextcanvas.model.communication.Collaborator;
 import net.adam85w.ddd.boundedcontextcanvas.model.communication.Message;
@@ -11,7 +12,6 @@ import net.adam85w.ddd.boundedcontextcanvas.model.communication.MessageType;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -30,8 +30,8 @@ class CommunicationCounter {
         this.mapper = mapper;
     }
 
-    HashMap<String, Long> count(LocalDateTime changeAt) throws JsonProcessingException {
-        var communications = obtainCommunications(changeAt);
+    HashMap<String, Long> count(CanvasOperation operation) throws JsonProcessingException {
+        var communications = obtainCommunications(operation);
         HashMap<String, Long> summaries = new HashMap<>();
         for (String communicationType : Arrays.stream(MessageType.values()).map(type -> type.getName().toLowerCase()).toList()) {
             var amount = communications.stream().filter(communication -> communicationType.equals(communication.communicationType())).count();
@@ -40,9 +40,9 @@ class CommunicationCounter {
         return summaries;
     }
 
-    private Set<Communication> obtainCommunications(LocalDateTime changeAt) throws JsonProcessingException {
+    private Set<Communication> obtainCommunications(CanvasOperation operation) throws JsonProcessingException {
         Set<Communication> communications = new HashSet<>();
-        for (BoundedContextAware boundedContextAware : service.obtain(changeAt)) {
+        for (BoundedContextAware boundedContextAware : service.obtain(operation)) {
             BoundedContext boundedContext = mapper.readValue(boundedContextAware.retrieveContext(), BoundedContext.class);
             for (net.adam85w.ddd.boundedcontextcanvas.model.Communication communication : boundedContext.getInboundCommunication()) {
                 for (Collaborator collaborator : communication.getCollaborators()) {
