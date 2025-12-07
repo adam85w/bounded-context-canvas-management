@@ -47,14 +47,14 @@ class CommunicationCounter {
             for (net.adam85w.ddd.boundedcontextcanvas.model.Communication communication : boundedContext.getInboundCommunication()) {
                 for (Collaborator collaborator : communication.getCollaborators()) {
                     for (Message message : communication.getMessages()) {
-                        communications.add(new Communication(collaborator.getName(), message.getType().getName().toLowerCase(), boundedContext.getName()));
+                        communications.add(new Communication(collaborator.getName(), message.getType().getName().toLowerCase(), message.getName(), boundedContext.getName()));
                     }
                 }
             }
             for (net.adam85w.ddd.boundedcontextcanvas.model.Communication communication : boundedContext.getOutboundCommunication()) {
                 for (Collaborator collaborator : communication.getCollaborators()) {
                     for (Message message : communication.getMessages()) {
-                        communications.add(new Communication(boundedContext.getName(), message.getType().getName().toLowerCase(), collaborator.getName()));
+                        communications.add(new Communication(boundedContext.getName(), message.getType().getName().toLowerCase(), message.getName(), collaborator.getName()));
                     }
                 }
             }
